@@ -1,0 +1,16 @@
+.env
+.DS_Store
+
+service_account.json
+
+__pycache__/
+
+*.pyc
+
+node_modules/
+ 
+# .claude 디렉토리: commands(스킬)만 포함, 나머지 제외
+
+.claude/*
+
+!.claude/commands/

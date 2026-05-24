@@ -1,0 +1,29 @@
+# Environment
+.env
+.env.local
+.env.production
+
+# Dependencies
+node_modules/
+
+# Build
+.next/
+__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+
+# Prisma
+lib/generated/
+
+# Test
+test-results/
+*.tsbuildinfo
+
+# Planning (internal)
+.planning/

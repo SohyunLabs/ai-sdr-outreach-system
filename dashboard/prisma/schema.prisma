@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Contact {
+  airtableId                  String         @id @map("airtable_id")
+  name                        String?
+  company                     String?
+  role                        String?
+  aiScore                     Float?         @map("ai_score")
+  email                       String?
+  linkedinUrl                 String?        @map("linkedin_url")
+  syncedAt                    DateTime       @default(now()) @map("synced_at")
+  aiRecentInteractionsSummary String?        @map("ai_recent_interactions_summary")
+  aiScoringReason             String?        @map("ai_scoring_reason")
+  about                       String?
+  connection                  Int?
+  country                     String?
+  assignee                    String?
+  experiences                 String?
+  follower                    Int?
+  leads                       CampaignLead[]
+  messages                    Message[]
+
+  @@map("contacts")
+}
+
+model Message {
+  id          String    @id @default(cuid())
+  airtableId  String?   @unique @map("airtable_id")
+  contactId   String    @map("contact_id")
+  generatedAt DateTime? @map("generated_at")
+  m1Subject   String?   @map("m1_subject")
+  m1BodyEmail String?   @map("m1_body_email")
+  m1BodyLi    String?   @map("m1_body_li")
+  m2Subject   String?   @map("m2_subject")
+  m2BodyEmail String?   @map("m2_body_email")
+  m2BodyLi    String?   @map("m2_body_li")
+  m3Subject   String?   @map("m3_subject")
+  m3BodyEmail String?   @map("m3_body_email")
+  m3BodyLi    String?   @map("m3_body_li")
+  m4LiConnReq String?   @map("m4_li_conn_req_body")
+  m5LiChat    String?   @map("m5_li_chat_body")
+  m6Subject   String?   @map("m6_subject")
+  m6BodyEmail String?   @map("m6_body_email")
+  m6BodyLi      String?   @map("m6_body_li")
+  campaignId    String?   @map("campaign_id")
+  sequenceType  String?   @map("sequence_type")
+  contact       Contact   @relation(fields: [contactId], references: [airtableId])
+
+  @@map("messages")
+}
+
+model Campaign {
+  id       String         @id @map("campaign_id")
+  name     String
+  syncedAt DateTime       @default(now()) @map("synced_at")
+  status   String?
+  archived Boolean        @default(false)
+  leads    CampaignLead[]
+
+  @@map("campaigns")
+}
+
+model CampaignLead {
+  id                 String     @id @default(cuid())
+  lemlistLeadId      String     @unique @map("lemlist_lead_id")
+  campaignId         String     @map("campaign_id")
+  airtableContactId  String?    @map("airtable_contact_id")
+  state              String?
+  lemlistStatus      String?    @map("lemlist_status")
+  sequenceStep       Int?       @map("sequence_step")
+  totalSequenceSteps Int?       @map("total_sequence_steps")
+  assignedAt         DateTime?  @map("assigned_at")
+  syncedAt           DateTime   @default(now()) @map("synced_at")
+  isLemlistDirty     Boolean    @default(false) @map("is_lemlist_dirty")
+  removedFromLemlist Boolean    @default(false) @map("removed_from_lemlist")
+  sequenceType       String?    @map("sequence_type")
+  slackThreadTs      String?    @map("slack_thread_ts")
+  slackChannelId     String?    @map("slack_channel_id")
+  slackLastPostedAt  DateTime?  @map("slack_last_posted_at")
+  airtableLeadId     String?    @map("airtable_lead_id")
+  activities         Activity[]
+  contact            Contact?   @relation(fields: [airtableContactId], references: [airtableId])
+  campaign           Campaign   @relation(fields: [campaignId], references: [id])
+
+  @@map("campaign_leads")
+}
+
+model Activity {
+  id                 String       @id @default(cuid())
+  campaignLeadId     String       @map("campaign_lead_id")
+  type               String
+  occurredAt         DateTime     @map("occurred_at")
+  sequenceStep       Int?         @map("sequence_step")
+  totalSequenceSteps Int?         @map("total_sequence_steps")
+  content            String?
+  sentOutside        Boolean      @default(false) @map("sent_outside")
+  campaignLead       CampaignLead @relation(fields: [campaignLeadId], references: [id])
+
+  @@map("activities")
+}
+
+model SyncLog {
+  id               String   @id @default(cuid())
+  source           String
+  syncedAt         DateTime @default(now()) @map("synced_at")
+  contactCount     Int?     @map("contact_count")
+  messageCount     Int?     @map("message_count")
+  campaignCount    Int?     @map("campaign_count")
+  leadCount        Int?     @map("lead_count")
+  activityCount    Int?     @map("activity_count")
+  joinFailureCount Int?     @map("join_failure_count")
+  errors           String?
+
+  @@map("sync_log")
+}

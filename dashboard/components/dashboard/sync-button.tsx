@@ -37,12 +37,12 @@ export function SyncButton({ lastSyncAt, onSync, syncing }: SyncButtonProps) {
         className={cn("gap-1.5")}
       >
         <RefreshCw className={cn("h-3.5 w-3.5", syncing && "animate-spin")} />
-        {syncing ? "동기화 중…" : "Data Sync"}
+        {syncing ? "Syncing..." : "Data Sync"}
         {result === "success" && (
-          <span className="text-emerald-600 text-xs ml-1">완료</span>
+          <span className="text-emerald-600 text-xs ml-1">Done</span>
         )}
         {result === "error" && (
-          <span className="text-red-600 text-xs ml-1">실패</span>
+          <span className="text-red-600 text-xs ml-1">Failed</span>
         )}
       </Button>
       <span className="text-xs text-muted-foreground tabular-nums">

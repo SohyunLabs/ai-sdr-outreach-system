@@ -1,0 +1,20 @@
+[
+  {
+    "campaign_id": "cam_SAMPLE_001",
+    "name": "APAC Outreach - Email - Q1",
+    "status": "draft",
+    "archived": false
+  },
+  {
+    "campaign_id": "cam_SAMPLE_002",
+    "name": "EMEA Outreach - LinkedIn - Q1",
+    "status": "draft",
+    "archived": false
+  },
+  {
+    "campaign_id": "cam_SAMPLE_003",
+    "name": "NAM Outreach - Email - Q4 (archived)",
+    "status": "ended",
+    "archived": true
+  }
+]

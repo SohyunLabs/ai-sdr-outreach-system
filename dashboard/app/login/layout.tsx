@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 export default function LoginLayout({ children }: { children: ReactNode }) {
   return (
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#060a0d]">
-      {/* 배경 그리드 패턴 */}
+      {/* Background grid pattern */}
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
@@ -13,7 +13,7 @@ export default function LoginLayout({ children }: { children: ReactNode }) {
         }}
       />
 
-      {/* 오로라 밴드 1 */}
+      {/* Aurora band 1 */}
       <div
         className="login-aurora absolute -top-1/4 left-0 h-[60%] w-[150%] opacity-30"
         style={{
@@ -23,7 +23,7 @@ export default function LoginLayout({ children }: { children: ReactNode }) {
         }}
       />
 
-      {/* 오로라 밴드 2 */}
+      {/* Aurora band 2 */}
       <div
         className="login-aurora-2 absolute -bottom-1/4 right-0 h-[50%] w-[130%] opacity-20"
         style={{
@@ -33,16 +33,16 @@ export default function LoginLayout({ children }: { children: ReactNode }) {
         }}
       />
 
-      {/* 글로우 오브 — 상단 좌측 */}
+      {/* Glow orb -- top left */}
       <div className="login-pulse absolute -top-32 -left-32 h-[500px] w-[500px] rounded-full bg-[#0a4a6e] opacity-20 blur-[120px]" />
 
-      {/* 글로우 오브 — 하단 우측 */}
+      {/* Glow orb -- bottom right */}
       <div className="login-pulse-delayed absolute -right-32 -bottom-32 h-[400px] w-[400px] rounded-full bg-[#1a3a5c] opacity-15 blur-[100px]" />
 
-      {/* 중앙 미묘한 글로우 */}
+      {/* Center subtle glow */}
       <div className="absolute top-1/2 left-1/2 h-[600px] w-[600px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#0d2847] opacity-20 blur-[150px]" />
 
-      {/* 떠다니는 파티클 */}
+      {/* Floating particles */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="login-particle" />
         <div className="login-particle" />
@@ -54,10 +54,10 @@ export default function LoginLayout({ children }: { children: ReactNode }) {
         <div className="login-particle" />
       </div>
 
-      {/* 비네트 효과 */}
+      {/* Vignette effect */}
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#060a0d_70%)]" />
 
-      {/* 콘텐츠 */}
+      {/* Content */}
       <div className="relative z-10">{children}</div>
     </div>
   );

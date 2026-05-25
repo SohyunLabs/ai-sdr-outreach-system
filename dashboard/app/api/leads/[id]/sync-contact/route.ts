@@ -19,8 +19,8 @@ const DB_TO_LEMLIST: Record<string, string> = {
   m6BodyLi: "m6FinalBody",
 };
 
-// 이메일 body 필드: \n → <br> 변환 필요 (HTML 이메일 렌더링)
-// LinkedIn body 필드: \n 그대로 유지 (순수 텍스트)
+// Email body fields: \n -> <br> conversion needed (HTML email rendering)
+// LinkedIn body fields: \n preserved (plain text)
 const EMAIL_BODY_KEYS = new Set(["m1BodyEmail", "m2BodyEmail", "m3BodyEmail", "m6BodyEmail"]);
 
 export async function POST(
@@ -35,22 +35,22 @@ export async function POST(
   });
 
   if (!lead) {
-    return NextResponse.json({ error: "리드를 찾을 수 없음" }, { status: 404 });
+    return NextResponse.json({ error: "Lead not found" }, { status: 404 });
   }
   if (!lead.contact) {
-    return NextResponse.json({ error: "연결된 컨택트 없음" }, { status: 400 });
+    return NextResponse.json({ error: "No linked contact" }, { status: 400 });
   }
 
   const contact = lead.contact;
   const errors: string[] = [];
 
-  // Lemlist REST API: lea_xxx ID 사용 (email은 더미 응답 반환)
+  // Platform REST API: lea_xxx ID used (email returns dummy response)
   const lemlistIdentifier = lead.lemlistLeadId;
   if (!lemlistIdentifier) {
-    return NextResponse.json({ error: "Lemlist lead ID가 없음" }, { status: 400 });
+    return NextResponse.json({ error: "No platform lead ID" }, { status: 400 });
   }
 
-  // 1. 배경 정보 sync
+  // 1. Background info sync
   const nameParts = (contact.name ?? "").trim().split(/\s+/);
   const firstName = nameParts[0] ?? "";
   const lastName = nameParts.slice(1).join(" ");
@@ -65,18 +65,18 @@ export async function POST(
     const msg = e instanceof Error ? e.message : String(e);
     if (msg.includes("404") || msg.toLowerCase().includes("not found")) {
       return NextResponse.json(
-        { error: "이 리드는 Lemlist에 존재하지 않습니다. Campaign Analysis에서 Data Sync를 실행해 주세요." },
+        { error: "This lead does not exist on the platform. Please run Data Sync from Campaign Analysis." },
         { status: 404 }
       );
     }
-    errors.push(`배경 정보: ${msg}`);
+    errors.push(`Background info: ${msg}`);
   }
 
-  // 2. 메시지 시퀀스 sync
+  // 2. Message sequence sync
   const msg = contact.messages[0];
   if (msg) {
     const lemlistVars: Record<string, string> = {};
-    // 1패스: LinkedIn body 포함 나머지 필드
+    // Pass 1: LinkedIn body and other fields
     for (const [dbKey, lemlistKey] of Object.entries(DB_TO_LEMLIST)) {
       if (EMAIL_BODY_KEYS.has(dbKey)) continue;
       const value = (msg as Record<string, unknown>)[dbKey];
@@ -84,7 +84,7 @@ export async function POST(
         lemlistVars[lemlistKey] = value;
       }
     }
-    // 2패스: 이메일 body 필드 — 같은 키를 쓰는 LinkedIn body를 덮어씀 + \n→<br>
+    // Pass 2: Email body fields -- overwrites LinkedIn body sharing same key + \n-><br>
     for (const [dbKey, lemlistKey] of Object.entries(DB_TO_LEMLIST)) {
       if (!EMAIL_BODY_KEYS.has(dbKey)) continue;
       const value = (msg as Record<string, unknown>)[dbKey];
@@ -96,21 +96,21 @@ export async function POST(
       try {
         await updateLeadVariables(lemlistIdentifier, lemlistVars);
       } catch (e) {
-        errors.push(`메시지 시퀀스: ${e instanceof Error ? e.message : String(e)}`);
+        errors.push(`Message sequence: ${e instanceof Error ? e.message : String(e)}`);
       }
     }
   }
 
-  // 3. 캠페인 상태 sync
+  // 3. Campaign status sync
   if (lead.state) {
     try {
       await updateLeadState(lead.campaignId, lemlistIdentifier, lead.state);
     } catch (e) {
-      errors.push(`캠페인 상태: ${e instanceof Error ? e.message : String(e)}`);
+      errors.push(`Campaign status: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 
-  // 동기화 완료 → dirty 초기화
+  // Sync complete -> reset dirty flag
   if (errors.length === 0) {
     await prisma.campaignLead.update({
       where: { id },

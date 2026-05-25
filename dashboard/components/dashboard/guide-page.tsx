@@ -3,7 +3,7 @@
 import { Terminal, ArrowRight, CheckCircle2, AlertCircle, Info } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
-// ─── Skill Guide ────────────────────────────────────────────────────────────
+// --- Skill Guide ---
 
 interface Step {
   number: number;
@@ -18,41 +18,41 @@ const steps: Step[] = [
   {
     number: 1,
     command: "/sdr:select",
-    title: "리드 선택",
-    description: "Airtable Contact_DB에서 오늘 연락할 최적의 리드 20명을 선별합니다.",
+    title: "Lead Selection",
+    description: "Selects the top 20 leads from the CRM database for today's outreach.",
     details: [
-      "Airtable Contact_DB (view: for_claude) 전체 후보 조회",
-      "Neon DB campaign_leads 조회로 캠페인 이력 확인 — active(활성 캠페인 참여 중) 리드 즉시 제외, archived 캠페인만 있는 리드는 재진행 후보로 플래그",
-      "AI Score, 최근 인터랙션, 직책, 이메일 유무 기반 랭킹",
-      "최종 리스트 확인 후 추가/제외 조정 가능",
+      "Queries CRM database (view: for_claude) for all candidates",
+      "Checks campaign history in PostgreSQL -- excludes leads in active campaigns, flags archived-only leads for re-engagement",
+      "Ranks by AI score, recent interactions, role, and email availability",
+      "Final list can be adjusted (add/remove) before confirmation",
     ],
-    note: "확정된 record ID 목록이 다음 스킬로 자동 인계됩니다.",
+    note: "Confirmed record IDs are automatically passed to the next skill.",
   },
   {
     number: 2,
     command: "/sdr:generate",
-    title: "메시지 생성",
-    description: "확정된 리드별로 채널별 맞춤형 아웃리치 메시지 6종을 생성하고 Neon messages DB에 저장합니다.",
+    title: "Message Generation",
+    description: "Generates 6 personalized outreach messages per confirmed lead and saves to PostgreSQL.",
     details: [
-      "M1 초기 이메일, M2-M3 이메일 팔로업 (각 100-125 단어)",
-      "M4 LinkedIn 연결 요청 (200자 이내 엄수), M5 LinkedIn 채팅",
-      "M6 최종 이메일 — 다른 각도 + Exit Statement 포함",
-      "Fitogether KB 기반 개인화 — 각 리드의 프로필, 경력, 콘텐츠 반영",
+      "M1 initial email, M2-M3 email follow-ups (100-125 words each)",
+      "M4 LinkedIn connection request (strict 200 character limit), M5 LinkedIn chat",
+      "M6 final email -- different angle + Exit Statement included",
+      "Knowledge base grounded personalization -- each lead's profile, experience, and content reflected",
     ],
-    note: "생성 완료 후 Neon messages ID 목록이 campaign_assign으로 자동 인계됩니다.",
+    note: "Generated message IDs are automatically passed to campaign_assign.",
   },
   {
     number: 3,
     command: "/sdr:campaign_assign",
-    title: "캠페인 할당",
-    description: "생성된 메시지와 연락처 정보를 Neon DB에 저장하고 캠페인을 배정합니다. Lemlist 실제 추가는 대시보드 Launch 버튼에서 수행합니다.",
+    title: "Campaign Assignment",
+    description: "Saves generated messages and contact info to the database and assigns to a campaign. Actual campaign platform launch is done via the dashboard Launch button.",
     details: [
-      "사용 가능한 Lemlist 캠페인 목록 조회 후 선택",
-      "Assignee 지정 → Neon contacts.assignee 업데이트",
-      "각 리드의 메시지 필드를 Neon DB에 저장 — Lemlist custom variable 형태로 준비",
-      "이메일 없는 리드는 건너뜀, 이미 존재하는 리드는 건너뜀",
+      "Queries available campaigns and selects target campaign",
+      "Assigns owner and updates contacts.assignee in the database",
+      "Saves each lead's message fields to the database -- prepared as campaign platform custom variables",
+      "Leads without email are skipped, already-existing leads are skipped",
     ],
-    note: "스킬 실행 후 대시보드 Campaign Analysis의 To Launch 섹션에 리드가 표시됩니다. Lemlist Launch 버튼을 눌러야 Lemlist에 실제로 추가됩니다.",
+    note: "After running this skill, leads appear in the Campaign Analysis 'To Launch' section. Click the Launch button to add them to the campaign platform.",
   },
 ];
 
@@ -60,10 +60,10 @@ function SkillGuideTab() {
   return (
     <div className="flex flex-col gap-8">
       <div>
-        <h3 className="text-base font-semibold">개요</h3>
+        <h3 className="text-base font-semibold">Overview</h3>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          Claude Code에서 아래 스킬을 순서대로 실행하여 아웃리치 파이프라인을 운영합니다.
-          각 스킬은 자동으로 다음 스킬에 필요한 데이터를 인계합니다.
+          Run the skills below in order from your CLI to operate the outreach pipeline.
+          Each skill automatically passes required data to the next.
         </p>
         <div className="mt-4 flex items-center gap-2 text-sm">
           {steps.map((step, i) => (
@@ -90,7 +90,7 @@ function SkillGuideTab() {
                 <div className="flex items-center gap-2">
                   <Terminal className="h-3.5 w-3.5 text-muted-foreground" />
                   <code className="text-sm font-mono font-semibold">{step.command}</code>
-                  <span className="text-sm text-muted-foreground">— {step.title}</span>
+                  <span className="text-sm text-muted-foreground">-- {step.title}</span>
                 </div>
                 <p className="mt-2 text-sm text-foreground">{step.description}</p>
                 <ul className="mt-3 flex flex-col gap-1.5">
@@ -114,23 +114,23 @@ function SkillGuideTab() {
       </div>
 
       <div className="rounded-lg border border-border bg-card p-5">
-        <h3 className="text-sm font-semibold">대시보드 연동 방법</h3>
+        <h3 className="text-sm font-semibold">Dashboard Integration</h3>
         <div className="mt-1.5 text-sm text-muted-foreground flex flex-col gap-2">
           <p>
-            <code className="font-mono text-xs">/sdr:campaign_assign</code> 실행 후,
-            Campaign Analysis 탭의 <strong>To Launch</strong> 섹션에 리드가 표시됩니다.
+            After running <code className="font-mono text-xs">/sdr:campaign_assign</code>,
+            leads appear in the Campaign Analysis tab under the <strong>To Launch</strong> section.
           </p>
           <ol className="list-decimal list-inside flex flex-col gap-1 pl-1">
-            <li>체크박스로 런치할 리드를 선택합니다 (전체 선택 가능)</li>
+            <li>Select leads to launch using checkboxes (bulk select available)</li>
             <li>
-              상단 <strong>Lemlist Launch</strong> 버튼을 클릭합니다 — 선택한 리드가 Lemlist 캠페인에 실제로 추가되고 자동 동기화됩니다
+              Click the <strong>Launch</strong> button -- selected leads are added to the campaign platform and automatically synced
             </li>
-            <li>런치된 리드는 <strong>Launched</strong> 섹션으로 이동합니다</li>
+            <li>Launched leads move to the <strong>Launched</strong> section</li>
           </ol>
           <p>
-            이 스킬을 통해 추가된 리드는{" "}
-            <code className="font-mono text-xs">airtableContactId</code>가 자동 저장되어
-            이름, 회사, 직책 정보가 테이블에 표시됩니다.
+            Leads added through this skill have their{" "}
+            <code className="font-mono text-xs">CRM Contact ID</code> saved automatically,
+            so name, company, and title information appears in the table.
           </p>
         </div>
       </div>
@@ -138,7 +138,7 @@ function SkillGuideTab() {
   );
 }
 
-// ─── Campaign Analysis ───────────────────────────────────────────────────────
+// --- Campaign Analysis ---
 
 interface GuideSection {
   title: string;
@@ -155,64 +155,64 @@ function SectionCard({ title, body }: GuideSection) {
 }
 
 const STATUS_COLOR_ROWS = [
-  { color: "bg-blue-500", meaning: "진행중", states: "스캔됨, 검토됨, 이메일 발송·열람, LinkedIn 방문·메시지·초대" },
-  { color: "bg-green-500", meaning: "응답/관심", states: "이메일 답장, LinkedIn 수락·답장, 관심" },
-  { color: "bg-red-500", meaning: "문제", states: "반송, 발송 실패, 수신 거부, 미관심" },
-  { color: "bg-gray-400", meaning: "완료/기타", states: "완료, 일시정지, 스킵, 수동" },
+  { color: "bg-blue-500", meaning: "In Progress", states: "Scanned, Reviewed, Email sent/opened, LinkedIn visit/message/invite" },
+  { color: "bg-green-500", meaning: "Responded/Interested", states: "Email reply, LinkedIn accept/reply, Interested" },
+  { color: "bg-red-500", meaning: "Issue", states: "Bounced, Send failed, Unsubscribed, Not interested" },
+  { color: "bg-gray-400", meaning: "Done/Other", states: "Completed, Paused, Skipped, Manual" },
 ];
 
 function CampaignAnalysisTab() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h3 className="text-base font-semibold">개요</h3>
+        <h3 className="text-base font-semibold">Overview</h3>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          선택한 Lemlist 캠페인 하나의 리드 현황을 모니터링합니다.
-          상단 요약 카드로 진행 상황을 한눈에 파악하고, 테이블에서 각 리드의 상세 상태를 확인합니다.
+          Monitors lead status for a selected campaign.
+          Use the summary cards for a quick overview, and the table for detailed per-lead status.
         </p>
       </div>
 
       <div className="flex flex-col gap-4">
         <SectionCard
-          title="Lemlist Launch 버튼"
+          title="Launch Button"
           body={
             <>
-              <code className="font-mono text-xs">/sdr:campaign_assign</code> 실행 후 To Launch 섹션에 나타난 리드를 Lemlist 캠페인에 실제로 추가합니다.
-              체크박스로 리드를 선택한 뒤 클릭하면 선택된 리드가 일괄 런치되고 자동으로 데이터 동기화가 실행됩니다.
-              런치된 리드는 Launched 섹션으로 이동합니다.
+              After running <code className="font-mono text-xs">/sdr:campaign_assign</code>, leads in the To Launch section can be added to the campaign platform.
+              Select leads with checkboxes, then click to bulk-launch them. Data sync runs automatically after launch.
+              Launched leads move to the Launched section.
             </>
           }
         />
 
         <SectionCard
-          title="Data Sync 버튼"
-          body="Lemlist API에서 최신 데이터를 가져와 DB에 저장합니다. 캠페인 상태, 리드 상태, 시퀀스 진행도가 업데이트됩니다. Lemlist에서 직접 상태를 변경한 경우 눌러주세요."
+          title="Data Sync Button"
+          body="Fetches the latest data from the campaign platform API and saves to the database. Campaign status, lead status, and sequence progress are updated. Click this if you made changes directly on the platform."
         />
 
         <SectionCard
-          title="요약 카드"
+          title="Summary Cards"
           body={
             <ul className="flex flex-col gap-1 mt-1">
-              <li><strong className="text-foreground">진행중</strong> — 현재 시퀀스가 돌아가고 있는 리드 수</li>
-              <li><strong className="text-foreground">응답</strong> — 이메일 또는 링크드인으로 답장이 온 리드 수</li>
-              <li><strong className="text-foreground">문제</strong> — 반송·발송 실패·수신 거부 리드 수</li>
-              <li><strong className="text-foreground">대기</strong> — To Launch 포함, 아직 시퀀스가 시작되지 않은 리드 수</li>
+              <li><strong className="text-foreground">In Progress</strong> -- Leads currently active in a sequence</li>
+              <li><strong className="text-foreground">Responded</strong> -- Leads who replied via email or LinkedIn</li>
+              <li><strong className="text-foreground">Issue</strong> -- Leads with bounces, send failures, or unsubscribes</li>
+              <li><strong className="text-foreground">Pending</strong> -- Leads in To Launch or not yet started in the sequence</li>
             </ul>
           }
         />
 
         <SectionCard
-          title="상태 컬럼"
+          title="Status Column"
           body={
             <>
-              <p>Lemlist 캠페인 내 리드의 마지막 액션 상태입니다. Lemlist가 기록한 이벤트 중 가장 최신 값을 보여줍니다.</p>
+              <p>Shows the latest action state for each lead in the campaign, based on the most recent event recorded by the platform.</p>
               <div className="mt-3 rounded-md border overflow-hidden">
                 <table className="w-full text-xs">
                   <thead>
                     <tr className="border-b bg-muted/40">
-                      <th className="px-3 py-2 text-left font-medium">색상</th>
-                      <th className="px-3 py-2 text-left font-medium">그룹</th>
-                      <th className="px-3 py-2 text-left font-medium">포함 상태</th>
+                      <th className="px-3 py-2 text-left font-medium">Color</th>
+                      <th className="px-3 py-2 text-left font-medium">Group</th>
+                      <th className="px-3 py-2 text-left font-medium">Included States</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -233,94 +233,94 @@ function CampaignAnalysisTab() {
         />
 
         <SectionCard
-          title="테이블 그룹"
+          title="Table Groups"
           body={
             <ul className="flex flex-col gap-2 mt-1">
               <li>
-                <strong className="text-foreground">Launched</strong> — Lemlist에 실제로 추가되어 시퀀스가 진행 중인 리드.
-                클릭하면 리드 상세 페이지로 이동합니다. Lemlist에 수동으로 추가한 리드는 <span className="inline-flex items-center rounded-full bg-purple-500 text-white text-[10px] px-1.5">매칭 실패</span> 배지로 표시되며 클릭이 비활성화됩니다.
+                <strong className="text-foreground">Launched</strong> -- Leads added to the campaign platform with an active sequence.
+                Click to view lead details. Leads added manually on the platform show a <span className="inline-flex items-center rounded-full bg-purple-500 text-white text-[10px] px-1.5">No Match</span> badge and are not clickable.
               </li>
               <li>
-                <strong className="text-foreground">To Launch</strong> — <code className="font-mono text-xs">/sdr:campaign_assign</code> 후 DB에만 저장되고 아직 Lemlist에 추가되지 않은 리드.
-                체크박스로 선택 후 Lemlist Launch 버튼으로 런치합니다. 클릭하면 메시지 미리보기 및 단건 Launch 페이지로 이동합니다.
+                <strong className="text-foreground">To Launch</strong> -- Leads saved to the database via <code className="font-mono text-xs">/sdr:campaign_assign</code> but not yet added to the platform.
+                Select with checkboxes, then use the Launch button. Click to preview messages and access the single-lead launch page.
               </li>
             </ul>
           }
         />
 
         <SectionCard
-          title="이름·회사·직책이 표시되는 리드"
+          title="Name, Company, and Title Display"
           body={
             <>
-              <code className="font-mono text-xs">/sdr:campaign_assign</code> 스킬로 추가된 리드만 연락처 정보가 표시됩니다.
-              이 스킬이 Airtable Contact ID를 저장하기 때문에, 직접 Lemlist에서 추가한 리드는 이름 없이 이메일만 표시됩니다.
+              Only leads added through the <code className="font-mono text-xs">/sdr:campaign_assign</code> skill show contact details.
+              This skill stores the CRM Contact ID, so leads added directly on the platform display only their email address.
             </>
           }
         />
 
         <SectionCard
-          title="시퀀스"
-          body="Lemlist 캠페인에 설정된 전체 스텝 중 현재 몇 번째 단계까지 진행됐는지를 나타냅니다. 예: 2/5 = 5단계짜리 캠페인에서 2번째 스텝 완료."
+          title="Sequence"
+          body="Shows how far the lead has progressed through the campaign steps. Example: 2/5 = completed step 2 of a 5-step campaign."
         />
       </div>
     </div>
   );
 }
 
-// ─── Profile Analysis ────────────────────────────────────────────────────────
+// --- Profile Analysis ---
 
 function ProfileAnalysisTab() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h3 className="text-base font-semibold">개요</h3>
+        <h3 className="text-base font-semibold">Overview</h3>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          Airtable Contact DB의 모든 연락처를 Lemlist 캠페인 상태와 함께 보여줍니다.
-          캠페인에 배정됐든 아니든 모든 연락처가 표시되며, 연락처 단위로 아웃리치 진행 상황을 파악할 수 있습니다.
+          Displays all contacts from the CRM database alongside their campaign status.
+          All contacts are shown regardless of campaign assignment, allowing you to track outreach progress per contact.
         </p>
       </div>
 
       <div className="flex flex-col gap-4">
         <SectionCard
-          title="필터"
+          title="Filters"
           body={
             <ul className="flex flex-col gap-1 mt-1">
-              <li><strong className="text-foreground">상단 탭</strong> — 전체 / 진행중 / 응답 / 문제 / 기타 / 미배정 그룹 필터</li>
-              <li><strong className="text-foreground">캠페인 선택</strong> — 특정 캠페인에 속한 연락처만 필터링</li>
-              <li><strong className="text-foreground">AI 점수 최소</strong> — 설정한 점수 이상의 연락처만 표시</li>
-              <li><strong className="text-foreground">검색</strong> — 이름, 회사, 직책, 이메일로 검색</li>
+              <li><strong className="text-foreground">Top Tabs</strong> -- All / In Progress / Responded / Issue / Other / Unassigned group filter</li>
+              <li><strong className="text-foreground">Campaign Select</strong> -- Filter contacts belonging to a specific campaign</li>
+              <li><strong className="text-foreground">Min AI Score</strong> -- Show only contacts above the set score</li>
+              <li><strong className="text-foreground">Search</strong> -- Search by name, company, title, or email</li>
             </ul>
           }
         />
 
         <SectionCard
-          title="상태 컬럼"
-          body="연락처가 속한 캠페인 중 가장 활성 상태인 캠페인의 현재 상태를 표시합니다. 여러 캠페인에 등록된 경우 진행중(파란색) 캠페인을 우선 선택하고, 없으면 가장 최근 캠페인을 사용합니다."
+          title="Status Column"
+          body="Displays the current status of the most active campaign for each contact. If a contact belongs to multiple campaigns, the in-progress (blue) campaign is prioritized; otherwise the most recent campaign is used."
         />
 
         <SectionCard
-          title="미배정"
+          title="Unassigned"
           body={
             <>
-              아직 어떤 Lemlist 캠페인에도 추가되지 않은 연락처입니다.{" "}
-              <code className="font-mono text-xs">/sdr:select</code> →{" "}
-              <code className="font-mono text-xs">/sdr:generate</code> →{" "}
-              <code className="font-mono text-xs">/sdr:campaign_assign</code> 플로우를 실행하면 배정됩니다.
+              Contacts not yet added to any campaign.{" "}
+              Run the <code className="font-mono text-xs">/sdr:select</code> {"->"}{" "}
+              <code className="font-mono text-xs">/sdr:generate</code> {"->"}{" "}
+              <code className="font-mono text-xs">/sdr:campaign_assign</code> flow to assign them.
             </>
           }
         />
 
         <SectionCard
-          title="시퀀스"
-          body="해당 연락처의 주요 캠페인에서 전체 스텝 중 현재 몇 번째 단계까지 진행됐는지입니다. 미배정 연락처는 시퀀스 정보가 없어 표시되지 않습니다."
+          title="Sequence"
+          body="Shows the lead's progress through the primary campaign steps. Unassigned contacts have no sequence data and show no progress."
         />
 
         <SectionCard
-          title="클릭 동작"
+          title="Click Behavior"
           body={
             <ul className="flex flex-col gap-1 mt-1">
-              <li><strong className="text-foreground">미배정 연락처 클릭</strong> — 연락처 프로필 페이지로 이동 (Airtable 정보, AI 분석)</li>
-              <li><strong className="text-foreground">캠페인 배정 연락처 클릭</strong> — 리드 상세 페이지로 이동 (캠페인 시퀀스 전체 보기)</li>
+              <li><strong className="text-foreground">Unassigned contact click</strong> -- Opens the contact profile page (CRM info, AI analysis)</li>
+              <li><strong className="text-foreground">Campaign-assigned contact click</strong> -- Opens the lead detail page (full campaign sequence view)</li>
             </ul>
           }
         />
@@ -328,8 +328,8 @@ function ProfileAnalysisTab() {
         <div className="flex items-start gap-2 rounded-md bg-muted/50 px-4 py-3">
           <Info className="mt-0.5 h-3.5 w-3.5 shrink-0 text-blue-500" />
           <p className="text-sm text-muted-foreground">
-            Profile Analysis의 Sync는 Campaign Analysis와 동일한 Lemlist 동기화입니다.
-            어느 탭에서 Sync를 눌러도 양쪽 데이터가 모두 갱신됩니다.
+            The Sync button in Profile Analysis performs the same data sync as Campaign Analysis.
+            Clicking Sync on either tab updates data for both views.
           </p>
         </div>
       </div>
@@ -337,31 +337,31 @@ function ProfileAnalysisTab() {
   );
 }
 
-// ─── Lead Detail ─────────────────────────────────────────────────────────────
+// --- Lead Detail ---
 
 function LeadDetailTab() {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h3 className="text-base font-semibold">개요</h3>
+        <h3 className="text-base font-semibold">Overview</h3>
         <p className="mt-1.5 text-sm text-muted-foreground">
-          Campaign Analysis 또는 Profile Analysis에서 리드를 클릭하면 리드 상세 페이지로 이동합니다.
-          Launched 리드와 To Launch 리드에 따라 화면 동작이 다릅니다.
+          Clicking a lead from Campaign Analysis or Profile Analysis opens the lead detail page.
+          The view differs depending on whether the lead is Launched or To Launch.
         </p>
       </div>
 
       <div className="flex flex-col gap-4">
         <SectionCard
-          title="Launched 리드 (일반 모드)"
+          title="Launched Lead (Standard Mode)"
           body={
             <ul className="flex flex-col gap-2 mt-1">
-              <li><strong className="text-foreground">Data Sync</strong> — Lemlist에서 최신 상태·시퀀스 데이터를 가져와 DB를 업데이트합니다.</li>
-              <li><strong className="text-foreground">메시지 시퀀스 편집</strong> — 우측 상단 편집 버튼으로 메시지 내용을 직접 수정하고 저장할 수 있습니다.</li>
+              <li><strong className="text-foreground">Data Sync</strong> -- Fetches latest status and sequence data from the platform and updates the database.</li>
+              <li><strong className="text-foreground">Message Sequence Edit</strong> -- Use the edit button (top-right) to modify message content and save.</li>
               <li>
-                <strong className="text-foreground">미반영 변경사항 배너</strong> — 메시지를 저장하면 상단에 amber 배너가 표시됩니다.
+                <strong className="text-foreground">Unapplied Changes Banner</strong> -- After saving edits, an amber banner appears at the top.
                 <ul className="mt-1 flex flex-col gap-1 pl-4">
-                  <li><strong className="text-foreground">Apply Changes</strong> — 수정된 메시지를 Lemlist custom variable에 반영합니다.</li>
-                  <li><strong className="text-foreground">Discard Changes</strong> — 수정 내용을 버리고 Lemlist 원본 데이터로 복원합니다.</li>
+                  <li><strong className="text-foreground">Apply Changes</strong> -- Pushes modified messages to the platform as custom variables.</li>
+                  <li><strong className="text-foreground">Discard Changes</strong> -- Reverts edits and restores original platform data.</li>
                 </ul>
               </li>
             </ul>
@@ -369,45 +369,45 @@ function LeadDetailTab() {
         />
 
         <SectionCard
-          title="To Launch 리드 (Pending 모드)"
+          title="To Launch Lead (Pending Mode)"
           body={
             <ul className="flex flex-col gap-2 mt-1">
-              <li>Campaign Analysis의 To Launch 섹션에서 리드를 클릭하면 Pending 모드로 열립니다.</li>
-              <li><strong className="text-foreground">Lemlist Launch 버튼</strong> — 우측 캠페인 상태 카드에 표시됩니다. 클릭하면 해당 리드를 Lemlist에 추가하고 자동 동기화 후 Launched 상태의 리드 상세 페이지로 이동합니다.</li>
-              <li>Pending 모드에서는 미반영 배너·Apply Changes·Discard Changes가 표시되지 않습니다.</li>
+              <li>Clicking a lead from the To Launch section in Campaign Analysis opens it in Pending mode.</li>
+              <li><strong className="text-foreground">Launch Button</strong> -- Displayed on the campaign status card (right side). Clicking adds the lead to the platform, runs auto-sync, and navigates to the Launched lead detail page.</li>
+              <li>In Pending mode, the unapplied changes banner, Apply Changes, and Discard Changes are not shown.</li>
             </ul>
           }
         />
 
         <SectionCard
-          title="좌측 패널 — 배경 정보"
+          title="Left Panel -- Background Info"
           body={
             <ul className="flex flex-col gap-1 mt-1">
-              <li>이름, 국가, 회사, 직책, 이메일, LinkedIn URL</li>
-              <li>경력 (JSON 파싱 가능 시 구조화 표시, 아니면 텍스트)</li>
-              <li>소개 (About)</li>
+              <li>Name, country, company, title, email, LinkedIn URL</li>
+              <li>Experience (displayed as structured data when parseable, otherwise plain text)</li>
+              <li>About section</li>
             </ul>
           }
         />
 
         <SectionCard
-          title="좌측 패널 — AI 분석"
-          body="AI 점수 (0-10), 점수 산정 이유, 최근 관심사/인터랙션 요약이 표시됩니다. Airtable에서 AI 분석이 완료된 리드만 데이터가 표시됩니다."
+          title="Left Panel -- AI Analysis"
+          body="Shows the AI score (0-10), scoring rationale, and a summary of recent interests/interactions. Data is only displayed for contacts with completed AI analysis in the CRM."
         />
 
         <SectionCard
-          title="좌측 패널 — 활동 기록"
-          body="Lemlist에서 기록된 이벤트 이력이 시간순으로 표시됩니다. 이메일 발송·열람·답장, LinkedIn 방문·메시지·수락 등의 활동이 포함됩니다."
+          title="Left Panel -- Activity Log"
+          body="Displays the chronological event history recorded by the platform. Includes email sends, opens, and replies, as well as LinkedIn visits, messages, and connection accepts."
         />
 
         <SectionCard
-          title="우측 패널 — 메시지 시퀀스"
+          title="Right Panel -- Message Sequence"
           body={
             <ul className="flex flex-col gap-2 mt-1">
-              <li>리드에 이메일이 있으면 이메일 시퀀스, 없으면 LinkedIn 시퀀스를 표시합니다.</li>
-              <li>이미 발송된 스텝은 왼쪽에 파란 세로선과 <strong className="text-foreground">전송됨</strong> 표시로 구분됩니다.</li>
-              <li>이메일 답장 여부에 따라 분기 시퀀스가 활성/비활성으로 표시됩니다.</li>
-              <li>각 스텝 우측 화살표를 클릭해 본문을 펼쳐볼 수 있습니다.</li>
+              <li>Shows the email sequence if the lead has an email address, otherwise the LinkedIn sequence.</li>
+              <li>Already-sent steps are marked with a blue vertical bar and a <strong className="text-foreground">Sent</strong> indicator.</li>
+              <li>Branch sequences are shown as active or inactive based on whether an email reply was received.</li>
+              <li>Click the arrow on each step to expand and view the message body.</li>
             </ul>
           }
         />
@@ -416,7 +416,7 @@ function LeadDetailTab() {
   );
 }
 
-// ─── Main ────────────────────────────────────────────────────────────────────
+// --- Main ---
 
 export function GuidePage() {
   return (

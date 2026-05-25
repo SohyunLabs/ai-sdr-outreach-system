@@ -28,40 +28,40 @@ interface ProfileAnalysisViewProps {
 }
 
 const STATUS_GROUPS = [
-  { label: "전체", value: "all" },
-  { label: "대기중", value: "waiting" },
-  { label: "진행중", value: "active" },
-  { label: "응답", value: "replied" },
-  { label: "문제", value: "bounced" },
-  { label: "기타", value: "other" },
-  { label: "미배정", value: "unassigned" },
-  { label: "매칭 실패", value: "unmatched" },
+  { label: "All", value: "all" },
+  { label: "Waiting", value: "waiting" },
+  { label: "In Progress", value: "active" },
+  { label: "Replied", value: "replied" },
+  { label: "Issue", value: "bounced" },
+  { label: "Other", value: "other" },
+  { label: "Unassigned", value: "unassigned" },
+  { label: "No Match", value: "unmatched" },
 ];
 
 const STATE_LABELS: Record<string, string> = {
-  // 대기중
-  scanned: "대기중",
-  reviewed: "검토됨",
-  emailsSent: "이메일 발송",
-  emailsOpened: "이메일 열람",
-  linkedinVisitDone: "LinkedIn 방문",
-  linkedinMessageSent: "LinkedIn 메시지",
-  linkedinInviteSent: "LinkedIn 초대",
-  // 응답/관심
-  emailsReplied: "이메일 답장",
-  linkedinInviteAccepted: "LinkedIn 수락",
-  linkedinReplied: "LinkedIn 답장",
-  interested: "관심",
-  // 문제
-  emailsBounced: "반송",
-  emailsFailed: "발송 실패",
-  unsubscribed: "수신 거부",
-  notInterested: "미관심",
-  // 완료/기타
-  paused: "일시정지",
-  done: "완료",
-  skipped: "스킵",
-  manual: "수동",
+  // Waiting
+  scanned: "Waiting",
+  reviewed: "Reviewed",
+  emailsSent: "Email Sent",
+  emailsOpened: "Email Opened",
+  linkedinVisitDone: "LinkedIn Visit",
+  linkedinMessageSent: "LinkedIn Message",
+  linkedinInviteSent: "LinkedIn Invite",
+  // Replied/Interested
+  emailsReplied: "Email Replied",
+  linkedinInviteAccepted: "LinkedIn Accepted",
+  linkedinReplied: "LinkedIn Replied",
+  interested: "Interested",
+  // Issue
+  emailsBounced: "Bounced",
+  emailsFailed: "Send Failed",
+  unsubscribed: "Unsubscribed",
+  notInterested: "Not Interested",
+  // Complete/Other
+  paused: "Paused",
+  done: "Complete",
+  skipped: "Skipped",
+  manual: "Manual",
 };
 
 const WAITING_STATES = new Set(["scanned"]);
@@ -178,7 +178,7 @@ export function ProfileAnalysisView({ contacts, unmatchedLeads, lastSyncAt }: Pr
         {/* Search */}
         <input
           type="text"
-          placeholder="이름, 회사, 직책, 이메일 검색..."
+          placeholder="Search name, company, title, email..."
           value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
           className="h-8 w-56 rounded-md border bg-background px-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
@@ -208,7 +208,7 @@ export function ProfileAnalysisView({ contacts, unmatchedLeads, lastSyncAt }: Pr
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">전체 캠페인</SelectItem>
+            <SelectItem value="all">All Campaigns</SelectItem>
             {campaignOptions.map((c) => (
               <SelectItem key={c.id} value={c.id}>
                 {c.name}
@@ -219,7 +219,7 @@ export function ProfileAnalysisView({ contacts, unmatchedLeads, lastSyncAt }: Pr
 
         {/* Min AI Score */}
         <div className="flex items-center gap-1.5">
-          <span className="text-xs text-muted-foreground">AI 점수 최소</span>
+          <span className="text-xs text-muted-foreground">Min AI Score</span>
           <input
             type="number"
             min={0}
@@ -231,7 +231,7 @@ export function ProfileAnalysisView({ contacts, unmatchedLeads, lastSyncAt }: Pr
           />
         </div>
 
-        <span className="text-xs text-muted-foreground">{displayCount}명</span>
+        <span className="text-xs text-muted-foreground">{displayCount} contacts</span>
       </div>
       <span className="text-xs text-muted-foreground tabular-nums self-center">
         {formatSyncTimestamp(lastSyncAt)}
@@ -252,20 +252,20 @@ export function ProfileAnalysisView({ contacts, unmatchedLeads, lastSyncAt }: Pr
           </colgroup>
           <thead>
             <tr className="border-b bg-muted/40 text-xs text-muted-foreground">
-              <th className="px-4 py-2 text-left font-medium">이름</th>
-              <th className="px-4 py-2 text-left font-medium">회사</th>
-              <th className="px-4 py-2 text-left font-medium">직책</th>
-              <th className="px-4 py-2 text-left font-medium">AI 점수</th>
-              <th className="px-4 py-2 text-left font-medium">캠페인</th>
-              <th className="px-4 py-2 text-left font-medium">상태</th>
-              <th className="px-4 py-2 text-left font-medium">시퀀스</th>
+              <th className="px-4 py-2 text-left font-medium">Name</th>
+              <th className="px-4 py-2 text-left font-medium">Company</th>
+              <th className="px-4 py-2 text-left font-medium">Title</th>
+              <th className="px-4 py-2 text-left font-medium">AI Score</th>
+              <th className="px-4 py-2 text-left font-medium">Campaign</th>
+              <th className="px-4 py-2 text-left font-medium">Status</th>
+              <th className="px-4 py-2 text-left font-medium">Sequence</th>
             </tr>
           </thead>
           <tbody>
             {displayCount === 0 ? (
               <tr>
                 <td colSpan={7} className="px-4 py-8 text-center text-sm text-muted-foreground">
-                  조건에 맞는 리드가 없습니다
+                  No leads match the current filters
                 </td>
               </tr>
             ) : statusGroup === "unmatched" ? (
@@ -279,7 +279,7 @@ export function ProfileAnalysisView({ contacts, unmatchedLeads, lastSyncAt }: Pr
                   <td className="px-4 py-2 text-muted-foreground">—</td>
                   <td className="px-4 py-2 text-xs truncate">{lead.campaignName}</td>
                   <td className="px-4 py-2">
-                    <Badge className="text-xs font-normal border-0 bg-purple-500 text-white">매칭 실패</Badge>
+                    <Badge className="text-xs font-normal border-0 bg-purple-500 text-white">No Match</Badge>
                   </td>
                   <td className="px-4 py-2 text-muted-foreground">—</td>
                 </tr>
@@ -320,7 +320,7 @@ export function ProfileAnalysisView({ contacts, unmatchedLeads, lastSyncAt }: Pr
                   </td>
                   <td className="px-4 py-2">
                     {row.isUnassigned ? (
-                      <Badge className="text-xs font-normal bg-gray-400 text-white border-0">미배정</Badge>
+                      <Badge className="text-xs font-normal bg-gray-400 text-white border-0">Unassigned</Badge>
                     ) : row.primaryLead?.state ? (
                       <Badge className={cn("text-xs font-normal border-0", getStatusColor(row.primaryLead.state))}>
                         {STATE_LABELS[row.primaryLead.state] ?? row.primaryLead.state}
@@ -333,9 +333,9 @@ export function ProfileAnalysisView({ contacts, unmatchedLeads, lastSyncAt }: Pr
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="flex items-center gap-1 px-1.5 py-0 text-xs h-5 shrink-0">
                         {row.contact.email ? (
-                          <><Mail className="h-3 w-3" />이메일</>
+                          <><Mail className="h-3 w-3" />Email</>
                         ) : (
-                          <><Linkedin className="h-3 w-3" />링크드인</>
+                          <><Linkedin className="h-3 w-3" />LinkedIn</>
                         )}
                       </Badge>
                       {!row.isUnassigned && row.primaryLead?.sequenceStep != null && row.primaryLead?.totalSequenceSteps != null && (
@@ -354,7 +354,7 @@ export function ProfileAnalysisView({ contacts, unmatchedLeads, lastSyncAt }: Pr
       {totalPages > 1 && (
         <div className="flex items-center justify-between mt-4">
           <span className="text-xs text-muted-foreground">
-            {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, displayCount)} / {displayCount}명
+            {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, displayCount)} of {displayCount}
           </span>
           <div className="flex items-center gap-1">
             <Button
@@ -417,10 +417,10 @@ export function ProfileAnalysisView({ contacts, unmatchedLeads, lastSyncAt }: Pr
             <p className="text-muted-foreground truncate">{tooltip.row.contact.email}</p>
           )}
           {tooltip.row.contact.company && (
-            <p className="truncate"><span className="text-muted-foreground">회사</span> {tooltip.row.contact.company}</p>
+            <p className="truncate"><span className="text-muted-foreground">Company</span> {tooltip.row.contact.company}</p>
           )}
           {tooltip.row.contact.role && (
-            <p className="truncate"><span className="text-muted-foreground">직책</span> {tooltip.row.contact.role}</p>
+            <p className="truncate"><span className="text-muted-foreground">Title</span> {tooltip.row.contact.role}</p>
           )}
           <div className="flex items-center gap-3 pt-0.5">
             {tooltip.row.contact.aiScore != null && (
@@ -429,7 +429,7 @@ export function ProfileAnalysisView({ contacts, unmatchedLeads, lastSyncAt }: Pr
               </span>
             )}
             <span className="text-muted-foreground">
-              캠페인 {tooltip.row.contact.leads.length}개
+              {tooltip.row.contact.leads.length} campaign{tooltip.row.contact.leads.length !== 1 ? "s" : ""}
             </span>
           </div>
         </div>

@@ -1,25 +1,24 @@
 # Interest Profiling Agent
 
 **Model**: GPT-4o-mini (via n8n Agent Node)
-**Purpose**: Summarize professional interests from recent LinkedIn activity
+**Purpose**: Summarize professional interests from recent content engagement activity
 **Stage**: T4 -- Post-qualification enrichment
 
 ---
 
 ## Why GPT-4o-mini Instead of Claude?
 
-This agent processes 800+ individual profiles. Each call is a straightforward summarization task (not complex reasoning), making a smaller, cheaper model the right choice. GPT-4o-mini provides adequate quality for 2-4 sentence interest summaries at a fraction of the cost.
+This agent processes hundreds of individual profiles. Each call is a straightforward summarization task (not complex reasoning), making a smaller, cheaper model the right choice. GPT-4o-mini provides adequate quality for 2-4 sentence interest summaries at a fraction of the cost.
 
 ---
 
 ## System Prompt
 
 ```
-Role: You are an Interest Profiling Specialist for a sports performance
-technology company that provides GPS-based athlete tracking solutions for
-professional sports teams.
+Role: You are an Interest Profiling Specialist for a B2B SaaS company
+specializing in performance tracking technology for professional sports teams.
 
-Objective: Analyze a LinkedIn user's recent content interactions (posts they
+Objective: Analyze a user's recent content interactions (posts they
 liked, commented on, or shared) and produce a concise natural language summary
 of their professional interests and focus areas.
 
@@ -57,7 +56,7 @@ attention to practical applications of sports science in professional team setti
 ## User Prompt
 
 ```
-Task: Analyze the following LinkedIn user's recent content interactions and
+Task: Analyze the following user's recent content interactions and
 summarize their professional interests.
 
 Recent Content Interactions (up to 10 most recent posts they engaged with):
@@ -83,9 +82,9 @@ Load monitoring during pre-season: key metrics every S&C coach should track...
 ```
 
 **Design choices**:
-- Position tags (`[POST N/10]`) serve as reliable delimiters that don't appear in LinkedIn content
+- Position tags (`[POST N/10]`) serve as reliable delimiters that don't appear in source content
 - Only body text is included -- metadata (hashtags, URLs, author info) doesn't add meaningful signal for interest summarization
-- Raw content is **not stored** in Airtable -- only the agent's summary output is persisted. If re-generation is needed (e.g., prompt changes), Apify re-collects the data.
+- Raw content is **not stored** in Airtable -- only the agent's summary output is persisted. If re-generation is needed (e.g., prompt changes), the source adapter re-collects the data.
 
 ## Execution Modes
 
@@ -97,5 +96,5 @@ Load monitoring during pre-season: key metrics every S&C coach should track...
 ## Design Notes
 
 - **Content-only input**: Profile information (name, headline, experience) is intentionally excluded from this agent's input. The goal is pure interest signal from content engagement, not profile-based inference (which is already captured by the Profile Scoring agent).
-- **No-store policy**: Raw LinkedIn content is ephemeral in the n8n workflow. This reduces storage costs and avoids retaining third-party content long-term.
+- **No-store policy**: Raw source content is ephemeral in the n8n workflow. This reduces storage costs and avoids retaining third-party content long-term.
 - **Specificity instruction**: The prompt explicitly asks for specific topics ("hamstring injury prevention using GPS load data") rather than generic labels ("sports science") to maximize personalization value in downstream message generation.

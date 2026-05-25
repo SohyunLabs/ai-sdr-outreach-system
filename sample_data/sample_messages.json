@@ -1,0 +1,15 @@
+[
+  {
+    "id": "msg_SAMPLE_001",
+    "contact_id": "rec_SAMPLE_001",
+    "contact_name": "Sarah Chen",
+    "m1_subject": "GPS load monitoring and injury prevention at Pacific Sports Academy",
+    "m1_body_email": "Hi Sarah,\n\nRunning a sports science program across multiple squads means balancing training intensity with injury risk on a daily basis. Many heads of performance I speak with find that traditional monitoring approaches create data silos between S&C and coaching staff.\n\nI work with a B2B SaaS platform that helps sports science teams centralize GPS load data, automate threshold alerts, and share actionable dashboards with coaches in real time.\n\nWould it be worth a quick conversation about how your current monitoring setup handles cross-squad load comparisons?",
+    "m1_body_li": "Hi Sarah,\n\nRunning a sports science program across multiple squads means balancing training intensity with injury risk daily. Many performance leads find traditional monitoring creates data silos between S&C and coaching.\n\nI work with a platform that centralizes GPS load data, automates threshold alerts, and shares dashboards with coaches in real time.\n\nWould it be worth a quick conversation about your current monitoring setup?",
+    "m4_li_conn_req_body": "Hi Sarah, your work in sports science at Pacific Sports Academy caught my attention. I work in performance technology for field sports. Would value connecting.",
+    "campaign_id": null,
+    "sequence_type": null,
+    "generated_at": "2025-03-27T10:00:00Z",
+    "assignee": "Sales Rep A"
+  }
+]

@@ -26,13 +26,13 @@ export async function POST(
     include: { contact: { include: { messages: true } } },
   });
 
-  if (!lead) return NextResponse.json({ error: "리드를 찾을 수 없음" }, { status: 404 });
-  if (!lead.contact) return NextResponse.json({ error: "연결된 컨택트 없음" }, { status: 400 });
+  if (!lead) return NextResponse.json({ error: "Lead not found" }, { status: 404 });
+  if (!lead.contact) return NextResponse.json({ error: "No linked contact" }, { status: 400 });
 
-  // CSV export에서 _id(lea_XXXX)로 lead 데이터 조회
+  // Fetch lead data from CSV export using _id (lea_XXXX)
   const lemlistLead = await fetchLeadFromCampaign(lead.campaignId, lead.lemlistLeadId);
 
-  // 1. Contact 복원 (email, linkedinUrl, company, role)
+  // 1. Restore contact (email, linkedinUrl, company, role)
   const nameParts = [lemlistLead.firstName, lemlistLead.lastName].filter(Boolean).join(" ");
   await prisma.contact.update({
     where: { airtableId: lead.contact.airtableId },
@@ -45,7 +45,7 @@ export async function POST(
     },
   });
 
-  // 2. Message 복원
+  // 2. Restore message
   const msg = lead.contact.messages[0];
   if (msg) {
     const msgUpdate: Record<string, string | null> = {};
@@ -58,10 +58,10 @@ export async function POST(
     await prisma.message.update({ where: { id: msg.id }, data: msgUpdate });
   }
 
-  // 3. 상태 복원 — Lemlist lead에 lastState가 있으면 적용
+  // 3. Restore state -- apply lastState from platform lead if available
   const restoredState = lemlistLead.lastState ?? null;
 
-  // 4. dirty 플래그 초기화
+  // 4. Reset dirty flag
   await prisma.campaignLead.update({
     where: { id },
     data: {

@@ -1,6 +1,8 @@
 # Phase 1: Lead Discovery Pipeline
 
-Automated weekly pipeline built on **n8n** + **Apify** + **AI Agents** that discovers and qualifies potential leads from LinkedIn content engagement.
+> **Note**: This is a public portfolio version. The original implementation used third-party data collection integrations. This documentation describes the architecture and scoring logic; the public version uses synthetic sample data. Any production data collection must comply with source-platform terms and applicable privacy regulations.
+
+Automated weekly pipeline built on **n8n** + **AI Agents** that discovers and qualifies potential leads from public market signal engagement.
 
 ---
 
@@ -9,7 +11,7 @@ Automated weekly pipeline built on **n8n** + **Apify** + **AI Agents** that disc
 ```mermaid
 flowchart TB
     subgraph T1["T1: Content Collection"]
-        S1[Schedule Trigger\nWeekly Mon 10am] --> S2[Apify: LinkedIn Posts Search]
+        S1[Schedule Trigger\nWeekly Mon 10am] --> S2[Source Adapter: Signal Collection]
         S2 --> S3[Airtable: Content_DB]
     end
 
@@ -21,7 +23,7 @@ flowchart TB
     end
 
     subgraph T3["T3: Profile Collection & Filtering"]
-        S6 --> S8[Apify: Profile Reactions\nCollect engagers]
+        S6 --> S8[Source Adapter:\nProfile Collection]
         S8 --> S9[Claude Agent:\nEligibility Screener]
         S9 --> S10{Eligible?}
         S10 -->|Yes| S11[Claude Agent:\nProfile Scoring 1-10]
@@ -32,7 +34,7 @@ flowchart TB
     end
 
     subgraph T4["T4: Interest Profiling"]
-        S14 --> S16[Apify: Recent 10 Interactions]
+        S14 --> S16[Source Adapter:\nRecent Engagement Data]
         S16 --> S17[Preprocess:\nTag posts POST 1/10...10/10]
         S17 --> S18[GPT-4o-mini Agent:\nInterest Summary]
         S18 --> S19[Update Contact_DB:\nAI_Interest_Summary]
@@ -45,7 +47,7 @@ flowchart TB
 
 **Trigger**: Schedule -- every Monday at 10:00 AM
 
-**Apify Task**: `linkedin-posts-search-scraper`
+**Source adapter task** (configurable per data source)
 
 **Search Keywords**:
 - Sports Performance
@@ -56,7 +58,7 @@ flowchart TB
 
 **Collection Range**: Past 7 days
 
-**Output**: Raw LinkedIn posts stored in Airtable Content_DB with metadata (author, stats, hashtags, URL).
+**Output**: Raw source signals stored in Airtable Content_DB with metadata (author, stats, hashtags, URL).
 
 ---
 
@@ -86,7 +88,7 @@ An n8n AI Agent node evaluates whether each collected post would attract the tar
 
 ## T3: Profile Collection & 2-Stage Filtering
 
-For each qualified post, Apify collects profiles of users who engaged (liked, commented, shared).
+For each qualified post, the source adapter collects profiles of users who engaged (liked, commented, shared).
 
 ### Stage 1: Eligibility Screener (Binary Filter)
 
@@ -122,11 +124,11 @@ Profiles that pass eligibility screening are scored 1-10 on lead quality.
 
 ## T4: Interest Profiling (Reverse Tracking)
 
-For each qualified profile in Contact_DB, Apify collects their 10 most recent LinkedIn interactions (posts they liked/commented/shared). A GPT-4o-mini agent summarizes professional interests in 2-4 sentences.
+For each qualified profile in Contact_DB, the source adapter collects their 10 most recent content engagement data (posts they liked/commented/shared). A GPT-4o-mini agent summarizes professional interests in 2-4 sentences.
 
 ### Why GPT-4o-mini?
 
-Cost efficiency -- with 800+ individual API calls for profiling, a smaller model provides adequate quality for summarization at significantly lower cost than a larger model.
+Cost efficiency -- the internal workflow was designed to support hundreds of qualified profiles. With that volume of individual API calls for profiling, a smaller model provides adequate quality for summarization at significantly lower cost than a larger model. This public version uses synthetic sample data.
 
 ### Preprocessing
 
@@ -162,13 +164,13 @@ Only post body text is used -- metadata (hashtags, URLs, author info) is exclude
 | Field | Description |
 |-------|-------------|
 | Content_ID | Unique identifier |
-| Content_URL | LinkedIn post URL |
+| Content_URL | Source signal URL |
 | Content_Text | Post body text |
 | Content_Posted_Date | Publication date |
 | Content_HashTags | Associated hashtags |
 | Author_Name | Post author name |
 | Author_Headline | Author's job title |
-| Author_ID | LinkedIn user ID |
+| Author_ID | Source user ID |
 | Stats_Total_Reactions | Reaction count |
 | Stats_Comments | Comment count |
 | AI_Score_Content | Claude score (1-10) |
@@ -180,7 +182,7 @@ Only post body text is used -- metadata (hashtags, URLs, author info) is exclude
 | Field | Description |
 |-------|-------------|
 | Contact_Name | Profile name |
-| Contact_LinkedIn_URL | LinkedIn profile URL |
+| Contact_Profile_URL | Profile URL |
 | Contact_Headline | Job title |
 | Contact_Experience | Work history |
 | Is_Author | Whether they authored (vs. engaged with) the content |

@@ -1,26 +1,26 @@
 export const ACTIVITY_META: Record<string, { label: string; channel: "email" | "linkedin" | "system"; isInbound?: boolean }> = {
   // Email (Lemlist uses plural forms)
-  emailsSent:             { label: "이메일 전송", channel: "email" },
-  emailsOpened:           { label: "이메일 열람", channel: "email" },
-  emailsClicked:          { label: "이메일 링크 클릭", channel: "email" },
-  emailsReplied:          { label: "이메일 회신 수신", channel: "email", isInbound: true },
-  emailsBounced:          { label: "이메일 반송", channel: "email" },
-  emailsFailed:           { label: "이메일 발송 실패", channel: "email" },
-  // LinkedIn (type names TBD — will confirm once Phase 2/3 campaign has activity data)
-  linkedinSent:           { label: "LinkedIn 메시지 전송", channel: "linkedin" },
-  linkedinOpened:         { label: "LinkedIn 메시지 열람", channel: "linkedin" },
-  linkedinReplied:        { label: "LinkedIn 답장 수신", channel: "linkedin", isInbound: true },
-  linkedinVisit:          { label: "LinkedIn 프로필 방문", channel: "linkedin" },
-  linkedinInviteDone:     { label: "LinkedIn 일촌 신청", channel: "linkedin" },
-  linkedinConnect:        { label: "LinkedIn 일촌 신청", channel: "linkedin" },
-  linkedinInviteAccepted: { label: "LinkedIn 일촌 수락", channel: "linkedin", isInbound: true },
+  emailsSent:             { label: "Email Sent", channel: "email" },
+  emailsOpened:           { label: "Email Opened", channel: "email" },
+  emailsClicked:          { label: "Email Link Clicked", channel: "email" },
+  emailsReplied:          { label: "Email Reply Received", channel: "email", isInbound: true },
+  emailsBounced:          { label: "Email Bounced", channel: "email" },
+  emailsFailed:           { label: "Email Send Failed", channel: "email" },
+  // LinkedIn
+  linkedinSent:           { label: "LinkedIn Message Sent", channel: "linkedin" },
+  linkedinOpened:         { label: "LinkedIn Message Opened", channel: "linkedin" },
+  linkedinReplied:        { label: "LinkedIn Reply Received", channel: "linkedin", isInbound: true },
+  linkedinVisit:          { label: "LinkedIn Profile Visit", channel: "linkedin" },
+  linkedinInviteDone:     { label: "LinkedIn Invite Sent", channel: "linkedin" },
+  linkedinConnect:        { label: "LinkedIn Invite Sent", channel: "linkedin" },
+  linkedinInviteAccepted: { label: "LinkedIn Invite Accepted", channel: "linkedin", isInbound: true },
   // System
-  paused:                 { label: "시퀀스 일시정지", channel: "system" },
-  resumed:                { label: "시퀀스 재개", channel: "system" },
-  apiUnsubscribed:        { label: "수신 거부", channel: "system" },
-  conditionChosen:        { label: "분기 선택", channel: "system" },
-  variableSubscribed:     { label: "변수 설정", channel: "system" },
-  contactSkipped:         { label: "건너뜀", channel: "system" },
+  paused:                 { label: "Sequence Paused", channel: "system" },
+  resumed:                { label: "Sequence Resumed", channel: "system" },
+  apiUnsubscribed:        { label: "Unsubscribed", channel: "system" },
+  conditionChosen:        { label: "Branch Selected", channel: "system" },
+  variableSubscribed:     { label: "Variable Set", channel: "system" },
+  contactSkipped:         { label: "Skipped", channel: "system" },
 };
 
 export interface ActivityItem {
@@ -54,7 +54,7 @@ export interface MessageForActivity {
 const BR_RE = /<br\s*\/?>/gi;
 const clean = (s: string | null | undefined) => s?.replace(BR_RE, "\n").replace(/&nbsp;/g, " ") ?? null;
 
-/** sequenceStep 기반 본문 조회 (레거시, 아래 getBodyByLabel 사용 권장) */
+/** Lookup body by sequenceStep (legacy, prefer getBodyByLabel below) */
 export function getBodyForSentActivity(
   type: string,
   step: number | null | undefined,
@@ -77,20 +77,20 @@ export function getBodyForSentActivity(
 }
 
 /**
- * 활동 타입의 시간순 순서로 M1~M6 레이블 도출.
- * Lemlist sequenceStep 숫자에 의존하지 않음.
+ * Derives M1-M6 labels from chronological activity order.
+ * Does not depend on Lemlist sequenceStep numbers.
  *
- * 이메일 시퀀스:
- *   1번째 emailSent → M1
- *   emailOpened 있으면 2번째 emailSent → M2, 없으면 → M3
- *   3번째 emailSent → M6
- *   linkedinConnect → M4 (LinkedIn 일촌 신청)
- *   linkedinSent → M5
+ * Email sequence:
+ *   1st emailSent -> M1
+ *   if emailOpened, 2nd emailSent -> M2, otherwise -> M3
+ *   3rd emailSent -> M6
+ *   linkedinConnect -> M4 (LinkedIn invite)
+ *   linkedinSent -> M5
  *
- * LinkedIn-only 시퀀스:
- *   linkedinConnect → M4
- *   inviteAccepted 있으면: 1st linkedinSent → M5, 2nd → M1, 3rd → M2, 4th → M6
- *   inviteAccepted 없으면: 1st → M1, 2nd → M2, 3rd → M6
+ * LinkedIn-only sequence:
+ *   linkedinConnect -> M4
+ *   if inviteAccepted: 1st linkedinSent -> M5, 2nd -> M1, 3rd -> M2, 4th -> M6
+ *   if not accepted: 1st -> M1, 2nd -> M2, 3rd -> M6
  *
  * Returns Map<messageLabel, sentDate>
  */
@@ -103,7 +103,7 @@ export function deriveCompletedActivities(
   );
   const result = new Map<string, Date>();
 
-  // 첫 번째 답장 이후 아웃바운드 메시지는 수동 발송 — 시퀀스 단계로 미포함
+  // Outbound messages after first reply are manual sends -- excluded from sequence labels
   const firstReply = sorted.find(a => a.type === "linkedinReplied" || a.type === "emailsReplied");
   const cutoff = firstReply ? new Date(firstReply.occurredAt).getTime() : Infinity;
 
@@ -133,13 +133,13 @@ export function deriveCompletedActivities(
     }
   }
 
-  if (linkedinConnects[0]) result.set("LinkedIn 일촌 신청", new Date(linkedinConnects[0].occurredAt));
-  if (inviteAcceptedActivity) result.set("LinkedIn 일촌 수락", new Date(inviteAcceptedActivity.occurredAt));
+  if (linkedinConnects[0]) result.set("LinkedIn Invite", new Date(linkedinConnects[0].occurredAt));
+  if (inviteAcceptedActivity) result.set("LinkedIn Accepted", new Date(inviteAcceptedActivity.occurredAt));
 
   return result;
 }
 
-/** 특정 activity의 메시지 레이블 반환 (e.g. "M1", "M2", "M4") */
+/** Returns the message label for a specific activity (e.g. "M1", "M2", "M4") */
 export function getActivityMessageLabel(
   activityId: string,
   activities: Pick<ActivityItem, "id" | "type" | "occurredAt" | "sentOutside">[],
@@ -151,7 +151,7 @@ export function getActivityMessageLabel(
   const activity = activities.find(a => a.id === activityId);
   if (!activity) return null;
 
-  // 첫 번째 답장 이후 아웃바운드 메시지는 수동 발송 — 시퀀스 단계로 미포함
+  // Outbound messages after first reply are manual sends -- excluded from sequence labels
   const firstReply = sorted.find(a => a.type === "linkedinReplied" || a.type === "emailsReplied");
   const cutoff = firstReply ? new Date(firstReply.occurredAt).getTime() : Infinity;
 
@@ -184,8 +184,8 @@ export function getActivityMessageLabel(
   return null;
 }
 
-/** 레이블(M1~M6)로 메시지 본문/제목 반환.
- *  channel="linkedin"이면 LI body 우선, 없으면 email body fallback */
+/** Returns message body/subject by label (M1-M6).
+ *  If channel="linkedin", LI body is preferred with email body fallback. */
 export function getBodyByLabel(
   label: string | null,
   msg: MessageForActivity | null,
@@ -210,7 +210,7 @@ export function groupActivitiesByDate(activities: ActivityItem[]): { date: strin
   const map = new Map<string, ActivityItem[]>();
   for (const item of activities) {
     const d = item.occurredAt instanceof Date ? item.occurredAt : new Date(item.occurredAt);
-    const key = d.toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "numeric", weekday: "long" });
+    const key = d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric", weekday: "long" });
     const existing = map.get(key) ?? [];
     existing.push(item);
     map.set(key, existing);
@@ -283,12 +283,12 @@ export function buildSteps(message: MessageRecord | null): Array<{
     },
     {
       ...STEP_META[3],
-      subject: message ? "LinkedIn 연결 요청" : null,
+      subject: message ? "LinkedIn Connection Request" : null,
       body: null,
     },
     {
       ...STEP_META[4],
-      subject: message ? "LinkedIn 채팅" : null,
+      subject: message ? "LinkedIn Chat" : null,
       body: message?.m5LiChat ?? null,
     },
     {
@@ -313,7 +313,7 @@ export function deriveSentSteps(
   return sent;
 }
 
-// ─── 분기형 시퀀스 플로우 ───────────────────────────────────────────
+// --- Branching sequence flow ---
 
 export interface FlowStepData {
   label: string;
@@ -330,7 +330,7 @@ export interface FlowBranchData {
   day?: number;
   branches: {
     label: string;
-    deciderLabels?: string[]; // 이 레이블 중 하나라도 sent이면 이 분기가 활성
+    deciderLabels?: string[]; // if any of these labels are sent, this branch is active
     steps: FlowNode[];
   }[];
 }
@@ -348,23 +348,23 @@ export function buildEmailSequence(message: MessageRecord | null): FlowNode[] {
     {
       type: "branch",
       data: {
-        conditionLabel: "M1 오픈 여부",
+        conditionLabel: "M1 Open Status",
         day: 3,
         branches: [
           {
-            label: "오픈 시",
+            label: "If Opened",
             deciderLabels: ["M2"],
             steps: [
               { type: "step", data: { label: "M2", channel: "email", subject: message?.m2Subject ?? null, body: message?.m2BodyEmail ?? null, subjectKey: "m2Subject", bodyKey: "m2BodyEmail" } },
-              { type: "step", data: { label: "LinkedIn 일촌 신청", channel: "linkedin", subject: "일촌 신청 (메시지 없음)", body: null, bodyKey: "m4LiConnReq" } },
+              { type: "step", data: { label: "LinkedIn Invite", channel: "linkedin", subject: "Invite (no message)", body: null, bodyKey: "m4LiConnReq" } },
             ],
           },
           {
-            label: "미오픈 시",
+            label: "If Not Opened",
             deciderLabels: ["M3"],
             steps: [
               { type: "step", data: { label: "M3", channel: "email", subject: message?.m3Subject ?? null, body: message?.m3BodyEmail ?? null, subjectKey: "m3Subject", bodyKey: "m3BodyEmail" } },
-              { type: "step", data: { label: "LinkedIn 일촌 신청", channel: "linkedin", subject: "일촌 신청 (메시지 없음)", body: null, bodyKey: "m4LiConnReq" } },
+              { type: "step", data: { label: "LinkedIn Invite", channel: "linkedin", subject: "Invite (no message)", body: null, bodyKey: "m4LiConnReq" } },
             ],
           },
         ],
@@ -373,18 +373,18 @@ export function buildEmailSequence(message: MessageRecord | null): FlowNode[] {
     {
       type: "branch",
       data: {
-        conditionLabel: "LinkedIn 일촌 수락 여부",
+        conditionLabel: "LinkedIn Invite Accepted",
         day: 5,
         branches: [
           {
-            label: "수락 시",
+            label: "If Accepted",
             deciderLabels: ["M5"],
             steps: [
               { type: "step", data: { label: "M5", channel: "linkedin", subject: message?.m5LiChat ? message.m5LiChat.slice(0, 40) + (message.m5LiChat.length > 40 ? "…" : "") : null, body: message?.m5LiChat ?? null, bodyKey: "m5LiChat" } },
             ],
           },
           {
-            label: "미수락 시",
+            label: "If Not Accepted",
             deciderLabels: [],
             steps: [],
           },
@@ -402,16 +402,16 @@ export function buildLinkedinSequence(message: MessageRecord | null): FlowNode[]
   return [
     {
       type: "step",
-      data: { label: "LinkedIn 일촌 신청", channel: "linkedin", subject: "일촌 신청 (메시지 없음)", body: null, day: 0, bodyKey: "m4LiConnReq" },
+      data: { label: "LinkedIn Invite", channel: "linkedin", subject: "Invite (no message)", body: null, day: 0, bodyKey: "m4LiConnReq" },
     },
     {
       type: "branch",
       data: {
-        conditionLabel: "LinkedIn 일촌 수락 여부",
+        conditionLabel: "LinkedIn Invite Accepted",
         day: 2,
         branches: [
           {
-            label: "수락 시",
+            label: "If Accepted",
             deciderLabels: ["M5"],
             steps: [
               { type: "step", data: { label: "M5", channel: "linkedin", subject: message?.m5LiChat ? message.m5LiChat.slice(0, 40) + (message.m5LiChat.length > 40 ? "…" : "") : null, body: message?.m5LiChat ?? null, day: 2, bodyKey: "m5LiChat" } },
@@ -421,7 +421,7 @@ export function buildLinkedinSequence(message: MessageRecord | null): FlowNode[]
             ],
           },
           {
-            label: "미수락 시",
+            label: "If Not Accepted",
             deciderLabels: [],
             steps: [
               { type: "step", data: { label: "M1", channel: "linkedin", subject: message?.m1Subject ?? null, body: message?.m1BodyLi ?? null, day: 2, bodyKey: "m1BodyLi" } },

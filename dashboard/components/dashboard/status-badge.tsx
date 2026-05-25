@@ -10,7 +10,7 @@ interface StatusBadgeProps {
 export function StatusBadge({ state, sequenceComplete }: StatusBadgeProps) {
   if (sequenceComplete) {
     return (
-      <Badge className="border-transparent bg-gray-400 text-white">완료</Badge>
+      <Badge className="border-transparent bg-gray-400 text-white">Complete</Badge>
     );
   }
 

@@ -1,0 +1,62 @@
+[
+  {
+    "airtable_id": "rec_SAMPLE_001",
+    "name": "Sarah Chen",
+    "company": "Pacific Sports Academy",
+    "role": "Head of Sports Science",
+    "email": "sarah.chen@example.com",
+    "country": "Australia",
+    "ai_score": 9,
+    "ai_scoring_reason": "Head of Sports Science at a professional sports academy with direct responsibility for performance monitoring and load management. Ideal decision maker for tracking solutions.",
+    "interest_summary": "Focused on injury prevention and return-to-play protocols, with interest in GPS-based workload monitoring for field sports. Engages with research on hamstring injury prediction and sensor technology.",
+    "assignee": null
+  },
+  {
+    "airtable_id": "rec_SAMPLE_002",
+    "name": "Marcus Weber",
+    "company": "FC Nordstadt",
+    "role": "Performance Analyst",
+    "email": "marcus.weber@example.com",
+    "country": "Germany",
+    "ai_score": 8,
+    "ai_scoring_reason": "Performance analyst at a professional football club responsible for match and training data analysis. Strong alignment with tracking technology use cases.",
+    "interest_summary": "Primarily interested in match-day GPS data analysis and training load periodization. Follows research on high-speed running metrics and metabolic power calculations.",
+    "assignee": null
+  },
+  {
+    "airtable_id": "rec_SAMPLE_003",
+    "name": "Yuki Tanaka",
+    "company": "Tokyo Athletic Institute",
+    "role": "S&C Coach",
+    "email": "yuki.tanaka@example.com",
+    "country": "Japan",
+    "ai_score": 7,
+    "ai_scoring_reason": "Strength and conditioning coach at a sports institute with interest in technology-assisted training. Moderate seniority but strong industry fit.",
+    "interest_summary": "Engages with content on strength training periodization and GPS-based load monitoring for team sports. Interest in integrating wearable data with training programs.",
+    "assignee": null
+  },
+  {
+    "airtable_id": "rec_SAMPLE_004",
+    "name": "Elena Rodriguez",
+    "company": "Club Deportivo Sol",
+    "role": "Director of Football Operations",
+    "email": "elena.rodriguez@example.com",
+    "country": "Spain",
+    "ai_score": 8,
+    "ai_scoring_reason": "Director-level role at a professional football club with purchasing authority for performance technology. Strong decision-maker signal.",
+    "interest_summary": "Focused on club-level strategy for performance technology adoption. Engages with content on football analytics, team management, and sports technology investment.",
+    "assignee": null
+  },
+  {
+    "airtable_id": "rec_SAMPLE_005",
+    "name": "James Okafor",
+    "company": "Lakeside United FC",
+    "role": "Sports Scientist",
+    "email": null,
+    "country": "Nigeria",
+    "ai_score": 7,
+    "ai_scoring_reason": "Sports scientist at a professional football club. Relevant role but limited seniority information. No email on file.",
+    "interest_summary": "Interested in practical applications of sports science in resource-constrained environments. Follows discussions on affordable performance monitoring solutions.",
+    "assignee": null
+  }
+]

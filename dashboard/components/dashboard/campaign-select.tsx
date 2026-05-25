@@ -27,8 +27,8 @@ export function CampaignSelect({ campaigns, selectedId, onSelect }: CampaignSele
     <div className="flex items-center gap-4">
       <Select value={selectedId} onValueChange={onSelect}>
         <SelectTrigger className="w-96">
-          <SelectValue placeholder="캠페인 선택">
-            {selected?.name ?? "캠페인 선택"}
+          <SelectValue placeholder="Select campaign">
+            {selected?.name ?? "Select campaign"}
           </SelectValue>
         </SelectTrigger>
         <SelectContent>

@@ -48,7 +48,7 @@ export function DashboardShell({ campaigns, lastSyncAt, contacts, unmatchedLeads
   const [pendingLeads, setPendingLeads] = useState<CampaignLeadWithContact[]>([]);
   const router = useRouter();
 
-  // URL을 현재 탭/캠페인 상태와 동기화 → 새로고침 시 동일 화면 유지
+  // Sync URL with current tab/campaign state for page refresh persistence
   useEffect(() => {
     const params = new URLSearchParams();
     params.set("tab", activePage);
@@ -86,7 +86,7 @@ export function DashboardShell({ campaigns, lastSyncAt, contacts, unmatchedLeads
 
   async function handleSync() {
     if (userRole !== "Admin") {
-      toast.error("권한이 없습니다. Admin 계정으로 로그인하세요.");
+      toast.error("Permission denied. Please sign in with an Admin account.");
       throw new Error("no-permission");
     }
     setSyncing(true);
@@ -104,7 +104,7 @@ export function DashboardShell({ campaigns, lastSyncAt, contacts, unmatchedLeads
     if (selected.length === 0) return;
 
     setLaunching(true);
-    toast.loading(`${selected.length}개 리드 Lemlist Launch 진행 중...`, { id: "launch", duration: Infinity });
+    toast.loading(`Launching ${selected.length} leads...`, { id: "launch", duration: Infinity });
     try {
       const results = await Promise.allSettled(
         selected.map((lead) =>
@@ -121,11 +121,11 @@ export function DashboardShell({ campaigns, lastSyncAt, contacts, unmatchedLeads
       const failed = results.length - succeeded;
 
       if (failed === 0) {
-        toast.success(`${succeeded}개 리드 Lemlist Launch 완료`, { id: "launch", duration: 3000 });
+        toast.success(`${succeeded} leads launched successfully`, { id: "launch", duration: 3000 });
       } else if (succeeded === 0) {
-        toast.error(`Launch 실패 (${failed}개)`, { id: "launch", duration: 3000 });
+        toast.error(`Launch failed (${failed})`, { id: "launch", duration: 3000 });
       } else {
-        toast.warning(`${succeeded}개 완료, ${failed}개 실패`, { id: "launch", duration: 3000 });
+        toast.warning(`${succeeded} succeeded, ${failed} failed`, { id: "launch", duration: 3000 });
       }
 
       if (succeeded > 0) {

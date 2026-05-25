@@ -40,7 +40,7 @@ type MessageTemplate = {
   m6Subject?: string | null;
 };
 
-/** LinkedIn 시퀀스 레이블로 DB 템플릿 body 반환 */
+/** Returns DB template body for LinkedIn sequence labels */
 function linkedinBodyByLabel(label: string, msg: MessageTemplate | null): string {
   if (!msg) return "";
   switch (label) {
@@ -54,7 +54,7 @@ function linkedinBodyByLabel(label: string, msg: MessageTemplate | null): string
   }
 }
 
-/** 이메일 전송 activity에서 제목/본문 추출 (DB 템플릿 매칭) */
+/** Extracts subject/body from email sent activity (DB template matching) */
 function matchEmailContent(
   a: Record<string, unknown>,
   msg: MessageTemplate | null
@@ -120,7 +120,7 @@ export async function GET(
 
     const message = contactData?.messages[0] ?? null;
 
-    // lemlist_activity_id → Neon content 맵 (전문이 저장된 소스)
+    // lemlist_activity_id -> Neon content map (full text stored source)
     const neonContentMap = new Map<string, string | null>();
     for (const na of neonActivities) {
       if (na.lemlist_activity_id) neonContentMap.set(na.lemlist_activity_id, na.content);
@@ -129,16 +129,16 @@ export async function GET(
     const allTypes = [...new Set(activities.map(a => a.type))];
     console.log(`[inbox] leadId=${lead.lemlistLeadId} activities=${activities.length} types:`, allTypes);
 
-    // 시퀀스 타입 판별
+    // Determine sequence type
     const hasEmail = lead.sequenceType === "email";
     const inviteAccepted = activities.some(a => a.type === "linkedinInviteAccepted");
 
-    // 첫 번째 답장 이후 아웃바운드는 수동 발송 — 시퀀스 레이블 미포함
+    // Outbound after first reply are manual sends -- excluded from sequence labels
     const sortedAll = [...activities].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     const firstReply = sortedAll.find(a => a.type === "linkedinReplied" || a.type === "emailsReplied");
     const cutoff = firstReply ? new Date(firstReply.createdAt).getTime() : Infinity;
 
-    // linkedinSent를 시간순 정렬 후 레이블 매핑 (DB 템플릿 fallback용) — 수동 발송 및 답장 이후 제외
+    // Sort linkedinSent chronologically and map labels (DB template fallback) -- excludes manual sends and post-reply
     const sortedLinkedinSents = sortedAll
       .filter(a => a.type === "linkedinSent" && !(a as Record<string, unknown>).sentOutSideOfLemlist && new Date(a.createdAt).getTime() <= cutoff);
 
@@ -167,7 +167,7 @@ export async function GET(
         case "emailsSent": {
           const subject = (a.subject as string) || "";
           const neonContent = neonContentMap.get(a._id as string) ?? null;
-          // Neon content 우선 (전문, <br> 포함) → fallback: subject 기반 DB 템플릿 매칭
+          // Neon content preferred (full text with <br>) -> fallback: subject-based DB template matching
           const body = neonContent ?? matchEmailContent(a, message).body;
           items.push({ ...base, type: "email-sent", subject, body, isHtml: true, isInbound: false });
           break;
@@ -187,13 +187,13 @@ export async function GET(
         case "emailsOpened":
           items.push({ ...base, type: "email-opened", isHtml: false, isInbound: false });
           break;
-        // linkedinInviteDone = 일촌 신청 보냄 (Lemlist 실제 타입명)
+        // linkedinInviteDone = connection request sent (Lemlist actual type name)
         case "linkedinInviteDone":
         case "linkedinConnect":
           items.push({
             ...base,
             type: "linkedin-connect",
-            // Neon content 우선 → fallback: Lemlist API 필드
+            // Neon content preferred -> fallback: Lemlist API fields
             body: neonContentMap.get(a._id as string) ?? ((a.m4LIConnReqBody as string) || ""),
             isHtml: false,
             isInbound: false,
@@ -201,7 +201,7 @@ export async function GET(
           break;
         case "linkedinSent": {
           const neonContent = neonContentMap.get(a._id as string) ?? null;
-          // Neon content 우선 → fallback: Lemlist API text/message → DB 템플릿
+          // Neon content preferred -> fallback: Lemlist API text/message -> DB template
           const label = linkedinSentLabels.get(a._id as string) ?? "M5";
           const body = neonContent ?? ((a.text as string) || (a.message as string) || linkedinBodyByLabel(label, message) || "");
           items.push({
@@ -217,7 +217,7 @@ export async function GET(
           items.push({
             ...base,
             type: "linkedin-reply",
-            // 실제 답장 내용: text 필드 (value 아님)
+            // Actual reply content: text field (not value)
             body: (a.text as string) || (a.value as string) || "",
             isHtml: false,
             isInbound: true,
@@ -233,7 +233,7 @@ export async function GET(
           items.push({ ...base, type: "linkedin-visit", isHtml: false, isInbound: false });
           break;
         default: {
-          // 미처리 타입 로그 — 타입명 확인용
+          // Unhandled type log -- for debugging type names
           const t = a.type as string;
           console.log(`[inbox] unhandled type="${t}" raw:`, JSON.stringify(a));
           break;

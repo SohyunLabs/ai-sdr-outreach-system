@@ -16,7 +16,7 @@ export async function PATCH(
     },
   });
 
-  // 이 컨택트와 연결된 모든 리드를 dirty로 표시
+  // Mark all leads linked to this contact as dirty
   await prisma.campaignLead.updateMany({
     where: { airtableContactId: airtableId },
     data: { isLemlistDirty: true },

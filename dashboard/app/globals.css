@@ -48,10 +48,10 @@
 
 :root {
   --radius: 0.625rem;
-  /* Fitogether brand tokens: #0A1316 dark navy, #AABACA blue-gray, #EBF0F4 cool light */
-  --fito-navy: #0A1316;
-  --fito-blue-gray: #AABACA;
-  --fito-light: #EBF0F4;
+  /* Brand tokens: #0A1316 dark navy, #AABACA blue-gray, #EBF0F4 cool light */
+  --brand-navy: #0A1316;
+  --brand-blue-gray: #AABACA;
+  --brand-light: #EBF0F4;
   --chart-1: oklch(0.45 0.025 225);
   --chart-2: oklch(0.55 0.10 192);
   --chart-3: oklch(0.55 0.10 140);
@@ -130,7 +130,7 @@
   }
 }
 
-/* === 로그인 페이지 애니메이션 === */
+/* === Login page animations === */
 
 @keyframes aurora {
   0%, 100% { transform: translateX(-25%) rotate(0deg) scale(1); opacity: 0.3; }

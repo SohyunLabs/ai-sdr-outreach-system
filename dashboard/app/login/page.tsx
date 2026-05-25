@@ -2,10 +2,10 @@ import { signIn } from "@/auth";
 import Image from "next/image";
 
 const errorMessages: Record<string, string> = {
-  AccessDenied: "접근이 거부되었습니다. 허용된 이메일이 아닙니다.",
-  Configuration: "서버 설정에 문제가 있습니다. 관리자에게 문의하세요.",
-  Verification: "인증 링크가 만료되었습니다. 다시 시도해주세요.",
-  Default: "로그인 중 오류가 발생했습니다. 다시 시도해주세요.",
+  AccessDenied: "Access denied. Your email is not authorized.",
+  Configuration: "Server configuration error. Contact administrator.",
+  Verification: "Verification link expired. Please try again.",
+  Default: "Login error. Please try again.",
 };
 
 export default async function LoginPage({
@@ -20,28 +20,28 @@ export default async function LoginPage({
 
   return (
     <div className="w-[640px] max-w-[90vw] mx-6 login-card-enter">
-      {/* 카드 — 글래스 + 애니메이티드 글로우 보더 */}
+      {/* Card -- glass + animated glow border */}
       <div className="login-glow-breathe login-shimmer relative overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] px-12 py-10 shadow-2xl backdrop-blur-xl">
-        {/* 상단 보더 글로우 라인 */}
+        {/* Top border glow line */}
         <div className="absolute inset-x-0 -top-px mx-8 h-px bg-gradient-to-r from-transparent via-[#4a9ece]/60 to-transparent" />
-        {/* 하단 보더 글로우 라인 */}
+        {/* Bottom border glow line */}
         <div className="absolute inset-x-0 -bottom-px mx-12 h-px bg-gradient-to-r from-transparent via-[#4a9ece]/20 to-transparent" />
-        {/* 좌측 보더 글로우 */}
+        {/* Left border glow */}
         <div className="absolute inset-y-0 -left-px my-12 w-px bg-gradient-to-b from-transparent via-[#4a9ece]/15 to-transparent" />
-        {/* 우측 보더 글로우 */}
+        {/* Right border glow */}
         <div className="absolute inset-y-0 -right-px my-12 w-px bg-gradient-to-b from-transparent via-[#4a9ece]/15 to-transparent" />
 
-        {/* 카드 내부 코너 글로우 */}
+        {/* Card inner corner glow */}
         <div className="absolute -top-20 -left-20 h-40 w-40 rounded-full bg-[#4a9ece]/[0.07] blur-[60px]" />
         <div className="absolute -bottom-20 -right-20 h-40 w-40 rounded-full bg-[#4a9ece]/[0.05] blur-[60px]" />
 
-        {/* 헤더 */}
+        {/* Header */}
         <div className="mb-8 text-center">
           <div className="flex justify-center mb-4">
             <div className="relative">
               <Image
                 src="/logo-white.svg"
-                alt="Fitogether"
+                alt="AI SDR"
                 width={150}
                 height={38}
                 priority
@@ -54,7 +54,7 @@ export default async function LoginPage({
           </p>
         </div>
 
-        {/* 구분선 */}
+        {/* Divider */}
         <div className="mb-8 flex items-center gap-4">
           <div className="h-px flex-1 bg-gradient-to-r from-transparent via-white/[0.08] to-white/[0.06]" />
           <span className="text-[11px] text-[#5a8aaa] uppercase tracking-widest font-medium">
@@ -63,14 +63,14 @@ export default async function LoginPage({
           <div className="h-px flex-1 bg-gradient-to-l from-transparent via-white/[0.08] to-white/[0.06]" />
         </div>
 
-        {/* 에러 메시지 */}
+        {/* Error message */}
         {errorMessage && (
           <div className="mb-6 rounded-lg border border-red-500/20 bg-red-500/[0.06] px-4 py-3 text-sm">
-            <p className="font-medium text-red-400">로그인 실패</p>
+            <p className="font-medium text-red-400">Login failed</p>
             <p className="mt-1 text-red-400/80">{errorMessage}</p>
             {error === "AccessDenied" && (
               <p className="mt-1 text-xs text-red-400/60">
-                다른 Google 계정으로 다시 시도해주세요.
+                Please try again with a different Google account.
               </p>
             )}
           </div>
@@ -107,15 +107,15 @@ export default async function LoginPage({
                   fill="#EA4335"
                 />
               </svg>
-              {error ? "다른 계정으로 다시 로그인" : "Google로 로그인"}
+              {error ? "Sign in with a different account" : "Sign in with Google"}
             </span>
           </button>
         </form>
 
-        {/* 푸터 */}
+        {/* Footer */}
         <div className="mt-8 text-center">
           <p className="text-[11px] text-[#3a5a74]">
-            Fitogether &middot; Powered by data
+            AI SDR Dashboard
           </p>
         </div>
       </div>

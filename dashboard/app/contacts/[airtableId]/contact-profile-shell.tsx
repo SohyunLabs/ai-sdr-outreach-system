@@ -77,13 +77,13 @@ function ContactActivityHistoryCard({
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-          활동 기록
+          Activity Log
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
         <div ref={scrollRef} className="max-h-[420px] overflow-y-auto flex flex-col gap-5 pr-1">
           {grouped.length === 0 ? (
-            <p className="text-center text-sm text-muted-foreground py-4">활동 기록 없음</p>
+            <p className="text-center text-sm text-muted-foreground py-4">No activity records</p>
           ) : (
             grouped.map(({ date, items }) => (
               <div key={date}>
@@ -98,7 +98,7 @@ function ContactActivityHistoryCard({
                     const meta = ACTIVITY_META[activity.type];
                     const isInbound = meta?.isInbound ?? false;
                     const isContentActivity = CONTACT_CONTENT_TYPES.has(activity.type);
-                    // 아웃바운드 sent: 캠페인 메시지 템플릿에서 content 조회
+                    // Outbound sent: lookup content from campaign message template
                     let displayBody: string | null = isInbound ? (activity.content ?? null) : null;
                     if (!isInbound && isContentActivity && activity.type !== "linkedinInviteDone" && messagesByCampaign && activity.campaignId) {
                       const campaignActivities = activities.filter(a => a.campaignId === activity.campaignId);
@@ -108,11 +108,11 @@ function ContactActivityHistoryCard({
                       const looked = getBodyByLabel(msgLabel, msg, meta?.channel);
                       displayBody = looked.body;
                     }
-                    // linkedinInviteDone은 항상 status-only (내용 없이 표시)
+                    // linkedinInviteDone is always status-only (shown without content)
                     const isStatusOnly = (!isInbound && !isContentActivity) ||
                       activity.type === "linkedinInviteDone";
                     const isExpanded = expandedIds.has(activity.id);
-                    const time = new Date(activity.occurredAt).toLocaleTimeString("ko-KR", {
+                    const time = new Date(activity.occurredAt).toLocaleTimeString("en-US", {
                       hour: "2-digit",
                       minute: "2-digit",
                     });
@@ -135,7 +135,7 @@ function ContactActivityHistoryCard({
                       );
                     }
 
-                    const senderName = isInbound ? (contactName ?? "상대방") : "팀";
+                    const senderName = isInbound ? (contactName ?? "Lead") : "Team";
 
                     return (
                       <div key={activity.id} className={cn(
@@ -177,12 +177,12 @@ function ContactActivityHistoryCard({
                                 className="text-[11px] text-muted-foreground hover:text-foreground mt-1.5 underline-offset-2 hover:underline"
                                 onClick={() => toggleContent(activity.id)}
                               >
-                                {isExpanded ? "접기" : "더 보기"}
+                                {isExpanded ? "Collapse" : "Show more"}
                               </button>
                             )}
                           </>
                         ) : (
-                          isContentActivity && <p className="text-xs text-muted-foreground/50 italic">내용 없음</p>
+                          isContentActivity && <p className="text-xs text-muted-foreground/50 italic">No content</p>
                         )}
                       </div>
                     );
@@ -218,7 +218,7 @@ export function ContactProfileShell({ profile, parsedExperiences, lastSyncAt }: 
   const hadEmailCampaign = profile.leads.some(l => l.sequenceType === "email");
   const flowNodes = hadEmailCampaign ? buildEmailSequence(msg) : buildLinkedinSequence(msg);
 
-  // 캠페인ID → 메시지 템플릿 매핑 (ContactActivityHistoryCard용)
+  // Campaign ID -> message template mapping (for ContactActivityHistoryCard)
   const messagesByCampaign = new Map<string, MessageForActivity>(
     profile.messages
       .filter(m => m.campaignId)
@@ -255,12 +255,12 @@ export function ContactProfileShell({ profile, parsedExperiences, lastSyncAt }: 
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "저장 실패");
+        throw new Error(data.error ?? "Save failed");
       }
       setEditMode(false);
       router.refresh();
     } catch (e) {
-      setSaveError(e instanceof Error ? e.message : "저장 중 오류 발생");
+      setSaveError(e instanceof Error ? e.message : "Error saving");
     } finally {
       setSaving(false);
     }
@@ -300,7 +300,7 @@ export function ContactProfileShell({ profile, parsedExperiences, lastSyncAt }: 
           </div>
           {data.subjectKey && (
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground">제목</span>
+              <span className="text-[11px] text-muted-foreground">Subject</span>
               <input
                 className="w-full text-sm border rounded-md px-2 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-primary"
                 value={draft[data.subjectKey] ?? ""}
@@ -310,7 +310,7 @@ export function ContactProfileShell({ profile, parsedExperiences, lastSyncAt }: 
           )}
           {data.bodyKey && (
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground">본문</span>
+              <span className="text-[11px] text-muted-foreground">Body</span>
               <textarea
                 className="w-full text-sm border rounded-md px-2 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-primary min-h-[80px] resize-y"
                 value={draft[data.bodyKey] ?? ""}
@@ -386,14 +386,14 @@ export function ContactProfileShell({ profile, parsedExperiences, lastSyncAt }: 
         <div className="flex-1 mb-2">
           <p className="text-xs font-medium text-muted-foreground mb-2">
             {day !== undefined && <span className="text-muted-foreground/60 mr-1">Day {day} ·</span>}
-            {conditionLabel}에 따라 분기
+            Branch by {conditionLabel}
           </p>
           <div className="grid grid-cols-2 gap-2">
             {branches.map((branch, bi) => (
               <div key={bi} className="rounded-lg border bg-muted/20 p-3">
                 <p className="text-xs font-semibold mb-2">{branch.label}</p>
                 {branch.steps.length === 0 ? (
-                  <p className="text-xs text-muted-foreground italic">건너뜀</p>
+                  <p className="text-xs text-muted-foreground italic">Skipped</p>
                 ) : (
                   <div className="flex flex-col">{renderNodes(branch.steps, `${key}-b${bi}`, true)}</div>
                 )}
@@ -429,7 +429,7 @@ export function ContactProfileShell({ profile, parsedExperiences, lastSyncAt }: 
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header
-          title={profile.name ?? "프로필 상세"}
+          title={profile.name ?? "Profile Details"}
           subtitle={[profile.role, profile.company].filter(Boolean).join(" · ")}
           back={
             <Button
@@ -453,7 +453,7 @@ export function ContactProfileShell({ profile, parsedExperiences, lastSyncAt }: 
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                      배경 정보
+                      Background Info
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
@@ -461,7 +461,7 @@ export function ContactProfileShell({ profile, parsedExperiences, lastSyncAt }: 
                       {/* Left: basic info */}
                       <div className="flex flex-col divide-y divide-border">
                         <div className="flex flex-col gap-0.5 py-2.5 first:pt-0">
-                          <span className="text-[11px] text-muted-foreground">이름</span>
+                          <span className="text-[11px] text-muted-foreground">Name</span>
                           <span className="text-sm font-medium">
                             {profile.name ?? "—"}
                             {profile.country && (
@@ -470,15 +470,15 @@ export function ContactProfileShell({ profile, parsedExperiences, lastSyncAt }: 
                           </span>
                         </div>
                         <div className="flex flex-col gap-0.5 py-2.5">
-                          <span className="text-[11px] text-muted-foreground">회사</span>
+                          <span className="text-[11px] text-muted-foreground">Company</span>
                           <span className="text-sm">{profile.company ?? "—"}</span>
                         </div>
                         <div className="flex flex-col gap-0.5 py-2.5">
-                          <span className="text-[11px] text-muted-foreground">직책</span>
+                          <span className="text-[11px] text-muted-foreground">Title</span>
                           <span className="text-sm">{profile.role ?? "—"}</span>
                         </div>
                         <div className="flex flex-col gap-0.5 py-2.5">
-                          <span className="text-[11px] text-muted-foreground">이메일</span>
+                          <span className="text-[11px] text-muted-foreground">Email</span>
                           <span className="text-sm">{profile.email ?? "—"}</span>
                         </div>
                         <div className="py-2.5">
@@ -501,17 +501,17 @@ export function ContactProfileShell({ profile, parsedExperiences, lastSyncAt }: 
                         </div>
                       </div>
 
-                      {/* Right: About + 경력 */}
+                      {/* Right: About + Experience */}
                       <div className="flex flex-col gap-4">
                         {profile.about && (
                           <div className="flex flex-col gap-1">
-                            <span className="text-[11px] text-muted-foreground">소개</span>
+                            <span className="text-[11px] text-muted-foreground">About</span>
                             <p className="text-sm leading-relaxed whitespace-pre-wrap">{profile.about}</p>
                           </div>
                         )}
                         {profile.experiences && (
                           <div className="flex flex-col gap-1">
-                            <span className="text-[11px] text-muted-foreground">경력</span>
+                            <span className="text-[11px] text-muted-foreground">Experience</span>
                             {parsedExperiences ? (
                               <div className="flex flex-col gap-3">
                                 {parsedExperiences.map((exp, i) => (
@@ -540,14 +540,14 @@ export function ContactProfileShell({ profile, parsedExperiences, lastSyncAt }: 
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                      AI 분석
+                      AI Analysis
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0 flex flex-col gap-4">
                     {profile.aiScore != null && (
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-[11px] text-muted-foreground">AI 점수</span>
+                          <span className="text-[11px] text-muted-foreground">AI Score</span>
                           <span className="text-sm font-semibold">{profile.aiScore}/10</span>
                         </div>
                         <div className="h-1.5 rounded-full bg-muted overflow-hidden">
@@ -560,18 +560,18 @@ export function ContactProfileShell({ profile, parsedExperiences, lastSyncAt }: 
                     )}
                     {profile.aiScoringReason && (
                       <div className="flex flex-col gap-1">
-                        <span className="text-[11px] text-muted-foreground">점수 산정 이유</span>
+                        <span className="text-[11px] text-muted-foreground">Scoring Reason</span>
                         <p className="text-sm leading-relaxed">{profile.aiScoringReason}</p>
                       </div>
                     )}
                     {profile.aiRecentInteractionsSummary && (
                       <div className="flex flex-col gap-1">
-                        <span className="text-[11px] text-muted-foreground">최근 관심사 / 인터랙션 요약</span>
+                        <span className="text-[11px] text-muted-foreground">Recent Interests / Interactions Summary</span>
                         <p className="text-sm leading-relaxed">{profile.aiRecentInteractionsSummary}</p>
                       </div>
                     )}
                     {!profile.aiScoringReason && !profile.aiRecentInteractionsSummary && (
-                      <p className="text-sm text-muted-foreground">AI 분석 데이터 없음</p>
+                      <p className="text-sm text-muted-foreground">No AI analysis data</p>
                     )}
                   </CardContent>
                 </Card>
@@ -596,12 +596,12 @@ export function ContactProfileShell({ profile, parsedExperiences, lastSyncAt }: 
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                      캠페인 상태
+                      Campaign Status
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
                     {profile.leads.length === 0 ? (
-                      <p className="text-sm text-muted-foreground">아직 Lemlist 캠페인 없음</p>
+                      <p className="text-sm text-muted-foreground">No campaigns yet</p>
                     ) : (
                       <div className="flex flex-col divide-y divide-border">
                         {profile.leads.map((lead) => (
@@ -627,27 +627,27 @@ export function ContactProfileShell({ profile, parsedExperiences, lastSyncAt }: 
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                        메시지 시퀀스
+                        Message Sequence
                       </CardTitle>
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
                           {hadEmailCampaign ? (
-                            <><Mail className="h-3 w-3" />이메일 시퀀스</>
+                            <><Mail className="h-3 w-3" />Email Sequence</>
                           ) : (
-                            <><svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>링크드인 시퀀스</>
+                            <><svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>LinkedIn Sequence</>
                           )}
                         </Badge>
                         {!editMode ? (
                           <Button variant="outline" size="sm" className="h-6 text-xs px-2" onClick={() => setEditMode(true)}>
-                            편집
+                            Edit
                           </Button>
                         ) : (
                           <>
                             <Button variant="ghost" size="sm" className="h-6 text-xs px-2" onClick={handleCancel} disabled={saving}>
-                              취소
+                              Cancel
                             </Button>
                             <Button size="sm" className="h-6 text-xs px-2" onClick={handleSave} disabled={saving}>
-                              {saving ? "저장 중..." : "저장"}
+                              {saving ? "Saving..." : "Save"}
                             </Button>
                           </>
                         )}
@@ -659,7 +659,7 @@ export function ContactProfileShell({ profile, parsedExperiences, lastSyncAt }: 
                   </CardHeader>
                   <CardContent className="pt-0 max-h-[600px] overflow-y-auto">
                     {!msg && (
-                      <p className="text-xs text-muted-foreground italic mb-3">메시지 데이터 없음 — 시퀀스 구조만 표시</p>
+                      <p className="text-xs text-muted-foreground italic mb-3">No message data -- showing sequence structure only</p>
                     )}
                     <div className="relative flex flex-col gap-0">
                       {renderNodes(flowNodes, "")}

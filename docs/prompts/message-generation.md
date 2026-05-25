@@ -22,7 +22,7 @@ The system prompt is a template that gets the company knowledge base injected at
 
 ```
 You are an expert B2B sales development representative (SDR) for [Company],
-a sports performance technology company. Your job is to write highly personalized
+a B2B SaaS company. Your job is to write highly personalized
 cold outreach messages for football (soccer) performance professionals.
 
 ---
@@ -44,19 +44,19 @@ role, experiences, and any recent interactions.
 
 | Message | Field Prefix | Channel | Length | Approach |
 |---------|-------------|---------|--------|----------|
-| M1 Initial | M1_Initial | Email + LinkedIn | 100-125 words | Problem framing based on prospect's specific pain. Low-friction CTA. |
-| M2 Follow-up | M2_FU1_EmailOpen | Email + LinkedIn | 100-125 words | Reference M1. New case study or proof point. |
-| M3 Re-engagement | M3_FU1_EmailClose | Email + LinkedIn | 100-125 words | Stronger hook with compelling stat/data. Different angle from M1. |
-| M4 Connection | M4_LI_ConnReq | LinkedIn only | < 200 chars, 3 sentences | Personalized connection request. No pitch. |
-| M5 Chat | M5_LI_Chat | LinkedIn only | ~100 words | Trust-building conversation after connecting. |
-| M6 Final | M6_Final | Email + LinkedIn | 100-125 words | Different angle from all previous + exit statement. |
+| M1 Initial | M1_Initial | Email + Professional Network | 100-125 words | Problem framing based on prospect's specific pain. Low-friction CTA. |
+| M2 Follow-up | M2_FU1_EmailOpen | Email + Professional Network | 100-125 words | Reference M1. New case study or proof point. |
+| M3 Re-engagement | M3_FU1_EmailClose | Email + Professional Network | 100-125 words | Stronger hook with compelling stat/data. Different angle from M1. |
+| M4 Connection | M4_LI_ConnReq | Professional Network only | < 200 chars, 3 sentences | Personalized connection request. No pitch. |
+| M5 Chat | M5_LI_Chat | Professional Network only | ~100 words | Trust-building conversation after connecting. |
+| M6 Final | M6_Final | Email + Professional Network | 100-125 words | Different angle from all previous + exit statement. |
 
 ### Per-Message Field Structure
 
 Each message (except M4 and M5) generates three fields:
 - `{prefix}_Subject` -- Email subject line
 - `{prefix}_Body_Email` -- Email body (post-processed: `\n` -> `<br>`)
-- `{prefix}_Body_LI` -- LinkedIn DM version (keeps `\n`)
+- `{prefix}_Body_LI` -- Professional network DM version (keeps `\n`)
 
 M4 generates only `M4_LI_ConnReq_Body`. M5 generates only `M5_LI_Chat_Body`.
 
@@ -109,17 +109,16 @@ M4 generates only `M4_LI_ConnReq_Body`. M5 generates only `M5_LI_Chat_Body`.
 ```
 Generate 6 outreach messages for this prospect:
 
-Contact Name: John Smith
-Current Company: Example FC
-Contact Profile: Head of Sports Science
+Contact Name: Jane Smith
+Current Company: Sample Corp
+Contact Profile: Head of Operations
 Experiences: [work history]
-About: [LinkedIn about section]
-AI Interest Summary: [2-4 sentence interest profile from T4]
+About: [profile summary]
+AI Interest Summary: [2-4 sentence interest profile]
 Is Author of Content: No
 Content (Concat): [aggregated content they engaged with]
 Country: United Kingdom
-Email: john.smith@example.com
-LinkedIn URL: https://linkedin.com/in/johnsmith
+Email: jane.smith@example.com
 ```
 
 ## Post-Processing Pipeline
@@ -130,16 +129,16 @@ After receiving JSON output from Claude:
 2. **M4 character validation** -- If M4 exceeds 200 characters, regenerate M4 only (max 2 retries)
 3. **Channel-specific formatting**:
    - Email body fields: `\n` -> `<br>` (HTML line breaks)
-   - LinkedIn body fields: keep `\n` as-is
+   - Professional network body fields: keep `\n` as-is
 4. **Sign-off injection**:
    - Email: append `Warm regards,\n\n{assignee}`
-   - LinkedIn (M1-M3 LI, M5, M6 LI): append `Best,\n\n{assignee}`
+   - Professional network (M1-M3 LI, M5, M6 LI): append `Best,\n\n{assignee}`
    - M4 (connection request): no sign-off
 5. **Database insert** -- Save to Neon PostgreSQL `messages` table via asyncpg
 
 ## Design Notes
 
-- **Knowledge base injection**: The company KB is loaded once and injected into every system prompt via string replacement (`{FITOGETHER_KB}`). This keeps the KB maintainable as a separate markdown file while ensuring every API call has full product context.
-- **M4 retry logic**: LinkedIn enforces a hard 200-character limit on connection request notes. Rather than truncating (which produces awkward messages), the script asks Claude to regenerate M4 specifically, providing the character count and asking for a shorter version.
+- **Knowledge base injection**: The company KB is loaded once and injected into every system prompt via string replacement (`{COMPANY_KB}`). This keeps the KB maintainable as a separate markdown file while ensuring every API call has full product context.
+- **M4 retry logic**: The professional network platform enforces a hard 200-character limit on connection request notes. Rather than truncating (which produces awkward messages), the script asks Claude to regenerate M4 specifically, providing the character count and asking for a shorter version.
 - **Content attribution rules (Rule 9)**: This is the most nuanced prompt rule. Most collected profiles engaged with content (liked/shared) but didn't author it. Referencing content they merely liked ("I saw your post about...") feels surveillance-like. The prompt draws a hard line: only reference content if the prospect actually wrote it.
-- **Concurrent processing**: `asyncio.Semaphore(10)` limits concurrent Claude API calls to 10, balancing throughput against API rate limits. Processing 20 leads takes roughly 2-3 minutes.
+- **Concurrent processing**: `asyncio.Semaphore(10)` limits concurrent Claude API calls to 10, balancing throughput against API rate limits. Processing hundreds of profiles is handled efficiently through async batching.

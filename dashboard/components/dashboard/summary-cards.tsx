@@ -7,9 +7,9 @@ interface SummaryCardsProps {
 }
 
 const MAIN_CARDS = [
-  { key: "total" as const, label: "전체 리드", icon: Users, color: "var(--color-chart-1)" },
-  { key: "waiting" as const, label: "대기", icon: Clock, color: "#f59e0b" },
-  { key: "inProgress" as const, label: "진행중", icon: Activity, color: "var(--color-chart-2)" },
+  { key: "total" as const, label: "Total Leads", icon: Users, color: "var(--color-chart-1)" },
+  { key: "waiting" as const, label: "Pending", icon: Clock, color: "#f59e0b" },
+  { key: "inProgress" as const, label: "In Progress", icon: Activity, color: "var(--color-chart-2)" },
 ];
 
 const ENDED_COLOR = "#6b7280";
@@ -35,7 +35,7 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
       <Card className="border-t-2" style={{ borderTopColor: ENDED_COLOR }}>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 pt-4 px-4">
           <CardTitle className="text-sm font-semibold" style={{ color: ENDED_COLOR }}>
-            종료
+            Ended
           </CardTitle>
           <CheckCircle className="h-4 w-4 shrink-0" style={{ color: ENDED_COLOR }} />
         </CardHeader>
@@ -48,7 +48,7 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
       <Card>
         <CardContent className="px-4 py-3">
           <div className="flex items-center justify-between mb-1">
-            <p className="text-xs text-muted-foreground">LinkedIn 일촌 수락</p>
+            <p className="text-xs text-muted-foreground">LinkedIn Accept</p>
             <UserCheck className="h-3.5 w-3.5 text-emerald-500" />
           </div>
           <div className="flex items-baseline gap-1.5">
@@ -60,7 +60,7 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
       <Card>
         <CardContent className="px-4 py-3">
           <div className="flex items-center justify-between mb-1">
-            <p className="text-xs text-muted-foreground">오픈</p>
+            <p className="text-xs text-muted-foreground">Open</p>
             <MailOpen className="h-3.5 w-3.5 text-emerald-500" />
           </div>
           <div className="flex items-baseline gap-1.5">
@@ -72,7 +72,7 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
       <Card>
         <CardContent className="px-4 py-3">
           <div className="flex items-center justify-between mb-1">
-            <p className="text-xs text-muted-foreground">응답</p>
+            <p className="text-xs text-muted-foreground">Reply</p>
             <MessageCircle className="h-3.5 w-3.5 text-emerald-500" />
           </div>
           <div className="flex items-baseline gap-1.5">
@@ -84,7 +84,7 @@ export function SummaryCards({ summary }: SummaryCardsProps) {
       <Card>
         <CardContent className="px-4 py-3">
           <div className="flex items-center justify-between mb-1">
-            <p className="text-xs text-muted-foreground">반송/실패</p>
+            <p className="text-xs text-muted-foreground">Bounce/Fail</p>
             <AlertTriangle className="h-3.5 w-3.5 text-red-500" />
           </div>
           <div className="flex items-baseline gap-1.5">

@@ -158,8 +158,8 @@ export function transformLead(
 }
 
 /**
- * Lemlist REST API는 GET /api/leads/{id}를 지원하지 않음.
- * 대신 캠페인 CSV export에서 _id(lea_XXXX)로 찾아 반환.
+ * Lemlist REST API does not support GET /api/leads/{id}.
+ * Instead, find by _id (lea_XXXX) in campaign CSV export.
  */
 export async function fetchLeadFromCampaign(
   campaignId: string,
@@ -174,8 +174,8 @@ export async function fetchLeadFromCampaign(
 }
 
 /**
- * PATCH /api/campaigns/{campaignId}/leads/{leadId} — 기본 정보 업데이트
- * 지원 필드: firstName, lastName, companyName, jobTitle
+ * PATCH /api/campaigns/{campaignId}/leads/{leadId} — update basic info
+ * Supported fields: firstName, lastName, companyName, jobTitle
  */
 export async function updateLeadInfo(
   campaignId: string,
@@ -202,8 +202,8 @@ export async function updateLeadInfo(
 }
 
 /**
- * PATCH /api/leads/{leadId}/variables — 커스텀 변수 업데이트
- * Lemlist API는 JSON이 아닌 URL-encoded form data를 요구함
+ * PATCH /api/leads/{leadId}/variables — update custom variables
+ * Lemlist API requires URL-encoded form data, not JSON
  */
 export async function updateLeadVariables(
   leadId: string,
@@ -229,9 +229,9 @@ export async function updateLeadVariables(
 }
 
 /**
- * POST /api/leads/start/{leadId} — 일시정지된 리드 재개
- * campaignId를 지정하면 해당 캠페인에서만 재개
- * 응답의 isPaused가 여전히 true면 실제 시작이 안 된 것
+ * POST /api/leads/start/{leadId} — resume a paused lead
+ * If campaignId is specified, resume only in that campaign
+ * If response isPaused is still true, the lead was not actually started
  */
 export async function resumeLead(leadId: string, campaignId?: string): Promise<{ isPaused: boolean }> {
   const url = new URL(
@@ -256,14 +256,14 @@ export async function resumeLead(leadId: string, campaignId?: string): Promise<{
   return { isPaused: isPaused as boolean };
 }
 
-/** state 업데이트 — Lemlist API 제약으로 best-effort */
+/** State update — best-effort due to Lemlist API limitations */
 export async function updateLeadState(
   _campaignId: string,
   _leadId: string,
   _state: string
 ): Promise<void> {
-  // Lemlist는 state를 직접 set하는 일반 API 없음 (interested/notInterested 등 전용 엔드포인트만 존재)
-  // 현재는 no-op
+  // Lemlist has no general API to set state directly (only dedicated endpoints for interested/notInterested etc.)
+  // Currently a no-op
 }
 
 export function transformActivity(activity: LemlistActivity): ActivityData {

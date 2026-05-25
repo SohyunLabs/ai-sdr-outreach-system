@@ -19,7 +19,7 @@ import { isSequenceComplete, type CampaignLeadWithContact } from "@/lib/dashboar
 import { deriveCompletedActivities } from "@/lib/lead-profile-utils";
 
 const TOTAL_STEPS = 5;
-const M_STEP_LABELS = new Set(["M1", "M2", "M3", "LinkedIn 일촌 신청", "M5", "M6"]);
+const M_STEP_LABELS = new Set(["M1", "M2", "M3", "LinkedIn Invite", "M5", "M6"]);
 
 function computeEffectiveDone(lead: CampaignLeadWithContact): { done: number; total: number } {
   if (!lead.activities.length) return { done: lead.sequenceStep ?? 0, total: lead.totalSequenceSteps ?? TOTAL_STEPS };
@@ -78,8 +78,8 @@ export function CombinedLeadTable({
   if (isEmpty) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-lg font-medium">리드 없음</p>
-        <p className="text-sm text-muted-foreground">이 캠페인에 리드가 없습니다</p>
+        <p className="text-lg font-medium">No leads</p>
+        <p className="text-sm text-muted-foreground">This campaign has no leads</p>
       </div>
     );
   }
@@ -89,7 +89,7 @@ export function CombinedLeadTable({
       <TableHeader>
         <TableRow className="border-b border-border">
           <TableHead className="w-10">
-            {/* Pending 섹션에 전체 선택은 그룹 행에서 처리 */}
+            {/* Pending section select-all is handled in group row */}
           </TableHead>
           <TableHead className="text-xs font-semibold uppercase tracking-wider text-foreground/70">Name</TableHead>
           <TableHead className="text-xs font-semibold uppercase tracking-wider text-foreground/70">Company</TableHead>
@@ -100,7 +100,7 @@ export function CombinedLeadTable({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {/* ── Launched 그룹 ── */}
+        {/* -- Launched group -- */}
         <TableRow className="hover:bg-transparent border-t-2 border-t-slate-400 dark:border-t-slate-500">
           <TableCell className="w-10 py-3 px-3" />
           <TableCell colSpan={6} className="py-3 px-0">
@@ -113,7 +113,7 @@ export function CombinedLeadTable({
         {sortedLaunched.length === 0 ? (
           <TableRow className="hover:bg-transparent">
             <TableCell colSpan={7} className="py-3 px-3 text-xs text-muted-foreground italic">
-              런치된 리드 없음
+              No launched leads
             </TableCell>
           </TableRow>
         ) : (
@@ -132,7 +132,7 @@ export function CombinedLeadTable({
                 )}
               >
                 <TableCell>
-                  {/* Launched 체크박스 비활성화 */}
+                  {/* Launched checkbox disabled */}
                 </TableCell>
                 <TableCell>
                   {isUnmatched ? (
@@ -151,7 +151,7 @@ export function CombinedLeadTable({
                 </TableCell>
                 <TableCell>
                   {isUnmatched ? (
-                    <Badge className="border-transparent bg-purple-500 text-white">매칭 실패</Badge>
+                    <Badge className="border-transparent bg-purple-500 text-white">No Match</Badge>
                   ) : (() => {
                     const isPaused = lead.campaignStatus === "paused"
                       && !GREEN_STATES.has(lead.state ?? "")
@@ -185,7 +185,7 @@ export function CombinedLeadTable({
           })
         )}
 
-        {/* ── To Launch 그룹 ── */}
+        {/* -- To Launch group -- */}
         <TableRow className="hover:bg-transparent border-t-2 border-t-slate-400 dark:border-t-slate-500">
           <TableCell className="w-10 py-3 px-3">
             <Checkbox
@@ -205,7 +205,7 @@ export function CombinedLeadTable({
         {pendingLeads.length === 0 ? (
           <TableRow className="hover:bg-transparent">
             <TableCell colSpan={7} className="py-3 px-3 text-xs text-muted-foreground italic">
-              런치 대기 리드 없음
+              No pending leads
             </TableCell>
           </TableRow>
         ) : (
@@ -243,7 +243,7 @@ export function CombinedLeadTable({
                   <Badge className="border-transparent bg-amber-500 text-white">To Launch</Badge>
                 </TableCell>
                 <TableCell>
-                  <Badge className="border border-amber-400 bg-transparent text-amber-700">Launch 대기중</Badge>
+                  <Badge className="border border-amber-400 bg-transparent text-amber-700">Awaiting Launch</Badge>
                 </TableCell>
                 <TableCell>
                   {(() => { const p = computeEffectiveDone(lead); return <SequenceBar step={p.done} total={p.total} />; })()}

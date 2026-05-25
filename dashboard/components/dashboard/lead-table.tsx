@@ -30,9 +30,9 @@ export function LeadTable({ leads, selectedIds, onSelectionChange, onRowClick }:
   if (leads.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-16 text-center">
-        <p className="text-lg font-medium">리드 없음</p>
+        <p className="text-lg font-medium">No Leads</p>
         <p className="text-sm text-muted-foreground">
-          이 캠페인에 리드가 없습니다
+          No leads in this campaign
         </p>
       </div>
     );
@@ -140,7 +140,7 @@ export function LeadTable({ leads, selectedIds, onSelectionChange, onRowClick }:
               </TableCell>
               <TableCell>
                 {isUnmatched ? (
-                  <Badge className="border-transparent bg-purple-500 text-white">매칭 실패</Badge>
+                  <Badge className="border-transparent bg-purple-500 text-white">No Match</Badge>
                 ) : (() => {
                   const isPaused = lead.campaignStatus === "paused"
                     && !GREEN_STATES.has(lead.state ?? "")

@@ -1,5 +1,6 @@
-# SDR Knowledge Base
-*Company-specific knowledge base for personalized message generation*
+# Sample Company Knowledge Base
+*Template for company-specific knowledge base injection into LLM prompts*
+*This public portfolio version uses placeholder content. Replace with your company's actual knowledge base.*
 
 ---
 
@@ -21,36 +22,25 @@ Each differentiator includes specific, verifiable claims with data points.
 
 ---
 
-## 3. Hardware Lineup (brief)
+## 3. Product Lineup
 
-| Device | Role |
-|--------|------|
-| Device A | Primary sensor/tracker |
-| Device B | Data hub / connectivity |
-| Device C | Charging / data upload |
-| Device D | Wearable component |
-
----
-
-## 4. Software Lineup (brief)
-
-| Software | Role |
-|----------|------|
-| Platform A | Cloud analytics |
-| Platform B | Real-time monitoring |
-| Platform C | Video integration |
-| Platform D | Device management |
+| Product | Role |
+|---------|------|
+| Product A | Primary offering |
+| Product B | Complementary service |
+| Product C | Analytics platform |
+| Product D | Integration layer |
 
 ---
 
-## 5. Key Differentiators for Outreach
+## 4. Key Differentiators for Outreach
 
 Specific, verifiable proof points used as hooks in personalized messages.
 Each differentiator is backed by data or third-party validation.
 
 ---
 
-## 6. Target Audience (ICP for SDR)
+## 5. Target Audience (ICP)
 
 - Primary personas and their roles
 - Industry verticals
@@ -58,15 +48,15 @@ Each differentiator is backed by data or third-party validation.
 
 ---
 
-## 7. Tone & Messaging Guidelines
+## 6. Tone & Messaging Guidelines
 
-- No hype, no generic claims -- anchor every message to specific proof points
+- No hype, no generic claims — anchor every message to specific proof points
 - Lead with the prospect's likely pain or context, not product features
 - Keep it concise
 
 ---
 
-## 8. Proof Points / Stats to Use in Messages
+## 7. Proof Points
 
 | Claim | Source |
 |-------|--------|

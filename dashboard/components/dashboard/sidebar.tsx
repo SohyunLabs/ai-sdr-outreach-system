@@ -30,13 +30,13 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
         collapsed ? "w-16" : "w-64"
       )}
     >
-      {/* 로고 영역 */}
+      {/* Logo */}
       <div className="flex h-14 items-center border-b border-sidebar-border px-4">
         {!collapsed ? (
           <>
             <Image
               src="/logo-black.svg"
-              alt="Fitogether"
+              alt="AI SDR"
               width={100}
               height={26}
               className="block dark:hidden"
@@ -44,7 +44,7 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
             />
             <Image
               src="/logo-white.svg"
-              alt="Fitogether"
+              alt="AI SDR"
               width={100}
               height={26}
               className="hidden dark:block"
@@ -64,7 +64,7 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
         )}
       </div>
 
-      {/* 네비게이션 */}
+      {/* Navigation */}
       <nav className="flex-1 space-y-1 p-2">
         {navItems.map(({ id, label, icon: Icon }) => (
           <button
@@ -83,7 +83,7 @@ export function Sidebar({ activePage, onNavigate }: SidebarProps) {
         ))}
       </nav>
 
-      {/* 하단: 접기/펼치기 버튼 */}
+      {/* Bottom: collapse/expand toggle */}
       <div className="border-t border-sidebar-border p-2">
         <Button
           variant="ghost"

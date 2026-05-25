@@ -1,35 +1,35 @@
 export const STATE_LABELS: Record<string, string> = {
-  tolaunch: "출시 대기",
-  scanned: "검토 중",
-  launching: "출시 중",
-  reviewed: "검토됨",
-  emailsSent: "이메일 발송",
-  emailsOpened: "이메일 열람",
-  emailsReplied: "이메일 회신",
-  emailsBounced: "이메일 반송",
-  emailsFailed: "발송 실패",
-  linkedinVisitDone: "LinkedIn 방문",
-  linkedinMessageSent: "LinkedIn 메시지",
-  linkedinInviteSent: "LinkedIn 초대 발송",
-  linkedinInviteDone: "LinkedIn 초대 완료",
-  linkedinInviteAccepted: "LinkedIn 일촌 수락",
-  linkedinReplied: "LinkedIn 답장",
-  linkedinSendFailed: "LinkedIn 발송 실패",
-  interested: "관심 있음",
-  notInterested: "관심 없음",
-  unsubscribed: "수신 거부",
-  apiUnsubscribed: "수신 거부",
-  paused: "일시정지",
-  done: "완료",
-  skipped: "건너뜀",
+  tolaunch: "To Launch",
+  scanned: "Scanned",
+  launching: "Launching",
+  reviewed: "Reviewed",
+  emailsSent: "Email Sent",
+  emailsOpened: "Email Opened",
+  emailsReplied: "Email Replied",
+  emailsBounced: "Email Bounced",
+  emailsFailed: "Send Failed",
+  linkedinVisitDone: "LinkedIn Visit",
+  linkedinMessageSent: "LinkedIn Message",
+  linkedinInviteSent: "LinkedIn Invite Sent",
+  linkedinInviteDone: "LinkedIn Invite Done",
+  linkedinInviteAccepted: "LinkedIn Accepted",
+  linkedinReplied: "LinkedIn Replied",
+  linkedinSendFailed: "LinkedIn Send Failed",
+  interested: "Interested",
+  notInterested: "Not Interested",
+  unsubscribed: "Unsubscribed",
+  apiUnsubscribed: "Unsubscribed",
+  paused: "Paused",
+  done: "Complete",
+  skipped: "Skipped",
 };
 
 export const STATE_COLORS: Record<string, string> = {
-  // Purple (대기 - pending Lemlist assignment)
+  // Purple (pending platform assignment)
   tolaunch: "bg-purple-500 text-white",
-  // Amber (대기 - not yet launched)
+  // Amber (pending - not yet launched)
   scanned: "bg-amber-500 text-white",
-  // Blue (진행중)
+  // Blue (in progress)
   launching: "bg-blue-400 text-white",
   reviewed: "bg-blue-500 text-white",
   emailsSent: "bg-blue-500 text-white",
@@ -39,23 +39,23 @@ export const STATE_COLORS: Record<string, string> = {
   linkedinInviteSent: "bg-blue-500 text-white",
   linkedinInviteDone: "bg-blue-500 text-white",
   linkedinInviteAccepted: "bg-blue-500 text-white",
-  // Gray (진행중 - 일시정지/건너뜀)
+  // Gray (in progress - paused/skipped)
   paused: "bg-gray-400 text-white",
   skipped: "bg-gray-400 text-white",
-  // Green (종료 - 응답)
+  // Green (ended - replied)
   emailsReplied: "bg-green-500 text-white",
   linkedinReplied: "bg-green-500 text-white",
-  // Green (배지 표시용 - 집계 제외)
+  // Green (badge display - excluded from counts)
   interested: "bg-green-500 text-white",
-  // Red (종료 - 반송/실패)
+  // Red (ended - bounced/failed)
   emailsBounced: "bg-red-500 text-white",
   emailsFailed: "bg-red-500 text-white",
   linkedinSendFailed: "bg-red-500 text-white",
   unsubscribed: "bg-red-500 text-white",
   apiUnsubscribed: "bg-red-500 text-white",
-  // Red (배지 표시용 - 집계 제외)
+  // Red (badge display - excluded from counts)
   notInterested: "bg-red-500 text-white",
-  // Gray (종료 - 기타)
+  // Gray (ended - other)
   done: "bg-gray-400 text-white",
   manual: "bg-gray-400 text-white",
 };
@@ -105,18 +105,18 @@ export function getStatusGroupColor(group: StatusGroup, state: string | null): s
 }
 
 const ACTION_LABEL_OVERRIDES: Record<string, string> = {
-  emailsFailed: "이메일 발송 실패",
-  linkedinSendFailed: "LinkedIn 발송 실패",
-  emailsReplied: "이메일 회신",
-  linkedinReplied: "LinkedIn 회신",
-  done: "시퀀스 완료",
-  tolaunch: "Launch 대기중",
-  scanned: "Launch 대기중",
+  emailsFailed: "Email Send Failed",
+  linkedinSendFailed: "LinkedIn Send Failed",
+  emailsReplied: "Email Replied",
+  linkedinReplied: "LinkedIn Replied",
+  done: "Sequence Complete",
+  tolaunch: "Awaiting Launch",
+  scanned: "Awaiting Launch",
 };
 
 export function getActionLabel(state: string | null, isComplete: boolean, lemlistStatus?: string | null): string {
-  if (WAITING_STATES.has(state ?? "")) return "Launch 대기중";
-  if (isComplete && !GREEN_STATES.has(state ?? "") && !RED_STATES.has(state ?? "") && lemlistStatus === "done") return "시퀀스 완료";
+  if (WAITING_STATES.has(state ?? "")) return "Awaiting Launch";
+  if (isComplete && !GREEN_STATES.has(state ?? "") && !RED_STATES.has(state ?? "") && lemlistStatus === "done") return "Sequence Complete";
   return ACTION_LABEL_OVERRIDES[state ?? ""] ?? STATE_LABELS[state ?? ""] ?? state ?? "—";
 }
 

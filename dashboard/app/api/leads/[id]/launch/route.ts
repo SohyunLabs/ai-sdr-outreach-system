@@ -33,21 +33,21 @@ export async function POST(
   });
 
   if (!lead) {
-    return NextResponse.json({ error: "리드를 찾을 수 없음" }, { status: 404 });
+    return NextResponse.json({ error: "Lead not found" }, { status: 404 });
   }
   if (!lead.contact) {
-    return NextResponse.json({ error: "연결된 컨택트 없음" }, { status: 400 });
+    return NextResponse.json({ error: "No linked contact" }, { status: 400 });
   }
 
   const lemlistLeadId = lead.lemlistLeadId;
   if (!lemlistLeadId) {
-    return NextResponse.json({ error: "Lemlist lead ID가 없음" }, { status: 400 });
+    return NextResponse.json({ error: "No platform lead ID" }, { status: 400 });
   }
 
   const contact = lead.contact;
   const errors: string[] = [];
 
-  // 1. 배경 정보 sync
+  // 1. Background info sync
   const nameParts = (contact.name ?? "").trim().split(/\s+/);
   const firstName = nameParts[0] ?? "";
   const lastName = nameParts.slice(1).join(" ");
@@ -59,10 +59,10 @@ export async function POST(
       jobTitle: contact.role ?? undefined,
     });
   } catch (e) {
-    errors.push(`배경 정보: ${e instanceof Error ? e.message : String(e)}`);
+    errors.push(`Background info: ${e instanceof Error ? e.message : String(e)}`);
   }
 
-  // 2. 메시지 시퀀스 sync
+  // 2. Message sequence sync
   const msg = contact.messages[0];
   if (msg) {
     const lemlistVars: Record<string, string> = {};
@@ -84,23 +84,23 @@ export async function POST(
       try {
         await updateLeadVariables(lemlistLeadId, lemlistVars);
       } catch (e) {
-        errors.push(`메시지 시퀀스: ${e instanceof Error ? e.message : String(e)}`);
+        errors.push(`Message sequence: ${e instanceof Error ? e.message : String(e)}`);
       }
     }
   }
 
-  // 3. Lemlist에서 리드 런치 (일시정지 해제)
+  // 3. Launch lead on platform (unpause)
   let launchResult: { isPaused: boolean } | null = null;
   try {
     launchResult = await resumeLead(lemlistLeadId, lead.campaignId);
     if (launchResult.isPaused) {
-      errors.push("런치: Lemlist 응답에 isPaused=true — 리드가 시작되지 않았습니다. Lemlist에서 직접 확인해주세요.");
+      errors.push("Launch: Platform responded with isPaused=true -- lead was not started. Please check the platform directly.");
     }
   } catch (e) {
-    errors.push(`런치: ${e instanceof Error ? e.message : String(e)}`);
+    errors.push(`Launch: ${e instanceof Error ? e.message : String(e)}`);
   }
 
-  // 동기화 완료 → dirty 초기화 + state 업데이트
+  // Sync complete -> reset dirty flag + update state
   if (errors.length === 0) {
     await prisma.campaignLead.update({
       where: { id },

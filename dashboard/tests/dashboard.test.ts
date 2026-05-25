@@ -134,12 +134,12 @@ describe("computeSummary", () => {
 // ─── formatSyncTimestamp ───────────────────────────────────────────────────────
 
 describe("formatSyncTimestamp", () => {
-  it("formats a valid date as 마지막 동기화: MM/DD HH:MM", () => {
+  it("formats a valid date as Last sync: MM/DD HH:MM", () => {
     const d = new Date("2026-04-03T14:35:00");
     const result = formatSyncTimestamp(d);
     const mo = (d.getMonth() + 1).toString().padStart(2, "0");
     const day = d.getDate().toString().padStart(2, "0");
-    const expected = `마지막 동기화: ${mo}/${day} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+    const expected = `Last sync: ${mo}/${day} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
     expect(result).toBe(expected);
   });
 
@@ -148,11 +148,11 @@ describe("formatSyncTimestamp", () => {
     const result = formatSyncTimestamp(d);
     const mo = (d.getMonth() + 1).toString().padStart(2, "0");
     const day = d.getDate().toString().padStart(2, "0");
-    const expected = `마지막 동기화: ${mo}/${day} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
+    const expected = `Last sync: ${mo}/${day} ${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
     expect(result).toBe(expected);
   });
 
-  it("returns 동기화 기록 없음 for null", () => {
-    expect(formatSyncTimestamp(null)).toBe("동기화 기록 없음");
+  it("returns 'No sync records' for null", () => {
+    expect(formatSyncTimestamp(null)).toBe("No sync records");
   });
 });

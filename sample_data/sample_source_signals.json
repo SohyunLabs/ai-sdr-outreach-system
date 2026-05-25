@@ -1,0 +1,23 @@
+[
+  {
+    "signal_id": "sig_001",
+    "content_text": "New research on hamstring injury prevention shows promising results when combining GPS load monitoring with neuromuscular screening protocols. In our pre-season testing with 45 athletes, we reduced hamstring injuries by 32% compared to the previous season.",
+    "hashtags": ["sportsscience", "injuryprevention", "GPS", "loadmonitoring"],
+    "ai_score_content": 8,
+    "ai_scoring_reason": "High technical depth with specific data points and research-backed insights. Directly relevant to GPS tracking and injury prevention workflows."
+  },
+  {
+    "signal_id": "sig_002",
+    "content_text": "The role of metabolic power in modern football performance analysis continues to evolve. Beyond simple distance metrics, understanding energy expenditure patterns gives coaches actionable insights for training load management.",
+    "hashtags": ["football", "performanceanalysis", "metabolicpower"],
+    "ai_score_content": 7,
+    "ai_scoring_reason": "Good industry insight with relevant technical concepts. Moderate depth but relevant to EPTS technology applications."
+  },
+  {
+    "signal_id": "sig_003",
+    "content_text": "Excited to announce our new partnership with a major sports brand! Big things coming for athletes everywhere.",
+    "hashtags": ["sports", "partnership", "announcement"],
+    "ai_score_content": 2,
+    "ai_scoring_reason": "Promotional content with no technical depth or industry insight. Filtered out as noise."
+  }
+]

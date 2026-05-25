@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-generate_messages.py — Fitogether AI SDR Message Generator
+generate_messages.py — AI SDR Message Generator (Portfolio Version)
 
 Usage:
     python generate_messages.py recID1 recID2 ...
@@ -198,8 +198,8 @@ def parse_json_response(raw: str) -> dict:
 # ---------------------------------------------------------------------------
 
 M4_RETRY_SYSTEM = (
-    "You are an SDR writing a LinkedIn connection request note for Fitogether, "
-    "a sports performance technology company. "
+    "You are an SDR writing a LinkedIn connection request note for "
+    "a B2B SaaS company. "
     "Rules: TOTAL length must be UNDER 200 characters (count every character including spaces), "
     "exactly 3 sentences, no emojis, no pitch — just establish relevance and reason to connect. "
     "Respond ONLY with the note text, nothing else."
@@ -297,7 +297,7 @@ async def main(record_ids: list, assignee: str) -> None:
         sys.exit(1)
 
     # Load KB and system prompt
-    kb_path = BASE_DIR / "knowledge" / "fitogether_sdr_kb.md"
+    kb_path = BASE_DIR / "knowledge" / "sample_company_kb.md"
     prompt_path = BASE_DIR / "prompts" / "system_prompt.md"
 
     if not kb_path.exists():
@@ -309,7 +309,7 @@ async def main(record_ids: list, assignee: str) -> None:
 
     kb = kb_path.read_text()
     system_template = prompt_path.read_text()
-    system_prompt = system_template.replace("{FITOGETHER_KB}", kb)
+    system_prompt = system_template.replace("{COMPANY_KB}", kb)
 
     print(f"Generating messages for {len(record_ids)} contact(s) (assignee={assignee}, concurrency={CONCURRENCY})...\n")
 

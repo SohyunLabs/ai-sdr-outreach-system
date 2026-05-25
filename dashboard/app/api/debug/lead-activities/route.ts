@@ -3,8 +3,8 @@ import { fetchLeadActivities } from "@/lib/lemlist";
 
 /**
  * GET /api/debug/lead-activities?leadId=[CampaignLead.id]
- * inbox와 동일한 fetchLeadActivities를 사용해 raw 데이터를 전부 반환.
- * 실제 activity 타입명 및 어떤 필드가 있는지 진단용.
+ * Uses the same fetchLeadActivities as inbox to return all raw data.
+ * For diagnosing actual activity type names and available fields.
  */
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
@@ -26,15 +26,15 @@ export async function GET(req: Request) {
     return Response.json({ error: "Lead not found in DB" }, { status: 404 });
   }
 
-  // inbox와 동일한 fetchLeadActivities 사용 (leadId 필터 적용)
+  // Same fetchLeadActivities as inbox (with leadId filter)
   const apiActivities = await fetchLeadActivities(lead.campaignId, lead.lemlistLeadId);
 
-  // 타입별로 그룹핑해서 각 타입의 raw 샘플 반환
+  // Group by type and return raw samples for each type
   const byType: Record<string, unknown[]> = {};
   for (const a of apiActivities) {
     const t = (a as Record<string, unknown>).type as string ?? "unknown";
     if (!byType[t]) byType[t] = [];
-    byType[t].push(a); // raw 전체 데이터
+    byType[t].push(a); // full raw data
   }
 
   return Response.json({
@@ -49,7 +49,7 @@ export async function GET(req: Request) {
     lemlistApi: {
       totalReturned: apiActivities.length,
       allTypes: Object.keys(byType),
-      byType, // 타입별 raw 전체 데이터
+      byType, // raw data grouped by type
     },
   });
 }

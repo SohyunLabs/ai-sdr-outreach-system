@@ -84,9 +84,9 @@ function htmlToPlain(html: string): string {
     .trim();
 }
 
-function formatKST(date: Date | string): string {
-  return new Date(date).toLocaleString("ko-KR", {
-    timeZone: "Asia/Seoul",
+function formatTimestamp(date: Date | string): string {
+  return new Date(date).toLocaleString("en-US", {
+    timeZone: "UTC",
     month: "short",
     day: "numeric",
     hour: "2-digit",
@@ -97,32 +97,32 @@ function formatKST(date: Date | string): string {
 const SKIP_TYPES = new Set(["conditionChosen", "campaignStepStarted", "skipped", "paused", "resumed"]);
 
 const ACTIVITY_INFO: Record<string, { label: string; needsAttention?: boolean; note?: string }> = {
-  emailsSent:             { label: "이메일 발송" },
-  emailsOpened:           { label: "이메일 열람" },
-  emailsReplied:          { label: "이메일 회신 수신" },
-  emailsBounced:          { label: "이메일 반송", needsAttention: true, note: "이메일이 반송되었습니다. 이메일 주소를 확인하거나 다른 채널로 전환하는 것을 권장합니다." },
-  linkedinConnect:        { label: "LinkedIn 일촌 신청" },
-  linkedinInviteDone:     { label: "LinkedIn 일촌 신청" },
-  linkedinInviteAccepted: { label: "LinkedIn 일촌 수락" },
-  linkedinSent:           { label: "LinkedIn 메시지 발송" },
-  linkedinReplied:        { label: "LinkedIn 답장 수신" },
-  linkedinVisit:          { label: "LinkedIn 프로필 방문" },
-  linkedinOpened:         { label: "LinkedIn 메시지 열람" },
-  linkedinSendFailed:     { label: "LinkedIn 발송 실패", needsAttention: true, note: "LinkedIn 메시지 발송에 실패했습니다. 연결 상태 및 계정 한도를 확인해 주세요." },
-  apiUnsubscribed:        { label: "수신 거부", needsAttention: true, note: "리드가 수신 거부를 요청했습니다. 즉시 후속 발송을 중단해 주세요." },
+  emailsSent:             { label: "Email Sent" },
+  emailsOpened:           { label: "Email Opened" },
+  emailsReplied:          { label: "Email Reply Received" },
+  emailsBounced:          { label: "Email Bounced", needsAttention: true, note: "Email bounced. Verify the email address or switch to another channel." },
+  linkedinConnect:        { label: "LinkedIn Invite Sent" },
+  linkedinInviteDone:     { label: "LinkedIn Invite Sent" },
+  linkedinInviteAccepted: { label: "LinkedIn Invite Accepted" },
+  linkedinSent:           { label: "LinkedIn Message Sent" },
+  linkedinReplied:        { label: "LinkedIn Reply Received" },
+  linkedinVisit:          { label: "LinkedIn Profile Visit" },
+  linkedinOpened:         { label: "LinkedIn Message Opened" },
+  linkedinSendFailed:     { label: "LinkedIn Send Failed", needsAttention: true, note: "LinkedIn message send failed. Check connection status and account limits." },
+  apiUnsubscribed:        { label: "Unsubscribed", needsAttention: true, note: "Lead has unsubscribed. Stop all follow-up messages immediately." },
 };
 
 const CONTENT_TYPES = new Set(["emailsSent", "emailsReplied", "linkedinSent", "linkedinReplied"]);
 
 // ── Public API ───────────────────────────────────────────────────────────────
 
-function formatKoreanDate(date: Date | string | null | undefined): string {
+function formatDate(date: Date | string | null | undefined): string {
   if (!date) return "";
-  return new Date(date).toLocaleDateString("ko-KR", {
+  return new Date(date).toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",
     day: "numeric",
-    timeZone: "Asia/Seoul",
+    timeZone: "UTC",
   });
 }
 
@@ -157,16 +157,16 @@ export async function postLeadLaunch({
     return null;
   }
 
-  const dateStr = formatKoreanDate(assignedAt);
+  const dateStr = formatDate(assignedAt);
   const metaParts: string[] = [];
-  if (campaignName) metaParts.push(`*캠페인:* ${campaignName}`);
-  if (assignee) metaParts.push(`*담당:* ${assignee}`);
+  if (campaignName) metaParts.push(`*Campaign:* ${campaignName}`);
+  if (assignee) metaParts.push(`*Assignee:* ${assignee}`);
 
   const headerText =
-    `*📤 신규 리드가 시퀀스에 추가되었습니다.*` +
+    `*New lead added to sequence.*` +
     (metaParts.length ? "\n" + metaParts.join("   ") : "");
 
-  const identityParts = [`🚀 *${leadName}*`];
+  const identityParts = [`*${leadName}*`];
   const subParts: string[] = [];
   if (company) subParts.push(company);
   if (role) subParts.push(role);
@@ -174,10 +174,10 @@ export async function postLeadLaunch({
   if (subParts.length) identityParts.push(subParts.join(" · "));
 
   const linkParts: string[] = [];
-  if (linkedinUrl) linkParts.push(`<${linkedinUrl}|LinkedIn 프로필>`);
+  if (linkedinUrl) linkParts.push(`<${linkedinUrl}|LinkedIn Profile>`);
   const appUrl = process.env.APP_URL;
   if (appUrl && campaignLeadId && campaignId) {
-    linkParts.push(`<${appUrl}/leads/${campaignLeadId}?from=campaign-analysis&campaignId=${campaignId}|리드 상세 페이지>`);
+    linkParts.push(`<${appUrl}/leads/${campaignLeadId}?from=campaign-analysis&campaignId=${campaignId}|Lead Detail Page>`);
   }
   if (linkParts.length) identityParts.push(linkParts.join("  ·  "));
 
@@ -189,14 +189,14 @@ export async function postLeadLaunch({
   ];
   blocks.push({
     type: "section",
-    text: { type: "mrkdwn", text: `활동 업데이트는 스레드에서 확인하세요.${dateStr ? `\n시퀀스 추가일: ${dateStr}` : ""}` },
+    text: { type: "mrkdwn", text: `Activity updates will appear in this thread.${dateStr ? `\nAdded to sequence: ${dateStr}` : ""}` },
   });
 
   try {
     const data = await slackPost("chat.postMessage", {
       channel: channelId,
       blocks,
-      text: `📤 ${leadName} 시퀀스 추가됨`,
+      text: `${leadName} added to sequence`,
       unfurl_links: false,
     });
     return (data.ts as string) ?? null;
@@ -223,12 +223,12 @@ export async function postActivitiesBatch(
   const visible = activities.filter((a) => !SKIP_TYPES.has(a.type));
   if (visible.length === 0) return;
 
-  const lines = ["*활동 히스토리*", ""];
+  const lines = ["*Activity History*", ""];
   for (const a of visible) {
     const info = ACTIVITY_INFO[a.type];
-    const label = info?.label ?? `알 수 없는 활동 (${a.type})`;
-    const prefix = info?.needsAttention ? "⚠️ " : "";
-    lines.push(`${prefix}*${label}* — ${formatKST(a.occurredAt)}`);
+    const label = info?.label ?? `Unknown activity (${a.type})`;
+    const prefix = info?.needsAttention ? "Warning: " : "";
+    lines.push(`${prefix}*${label}* -- ${formatTimestamp(a.occurredAt)}`);
     if (info?.note) lines.push(`_${info.note}_`);
     if (a.content && CONTENT_TYPES.has(a.type)) {
       const plain = htmlToPlain(a.content);
@@ -241,7 +241,7 @@ export async function postActivitiesBatch(
       channel: channelId,
       thread_ts: threadTs,
       blocks: [{ type: "section", text: { type: "mrkdwn", text: lines.join("\n") } }],
-      text: `활동 히스토리 (${visible.length}건)`,
+      text: `Activity history (${visible.length} events)`,
     });
   } catch (e) {
     console.error("[slack] postActivitiesBatch error:", e);
@@ -263,11 +263,11 @@ export async function postActivityToThread(
   if (!isConfigured() || SKIP_TYPES.has(activity.type)) return;
 
   const info = ACTIVITY_INFO[activity.type];
-  const label = info?.label ?? `알 수 없는 활동 (${activity.type})`;
-  const prefix = info?.needsAttention ? "⚠️ " : "";
-  const dateStr = formatKST(activity.occurredAt);
+  const label = info?.label ?? `Unknown activity (${activity.type})`;
+  const prefix = info?.needsAttention ? "Warning: " : "";
+  const dateStr = formatTimestamp(activity.occurredAt);
 
-  const lines = [`${prefix}*${label}* — ${dateStr}`];
+  const lines = [`${prefix}*${label}* -- ${dateStr}`];
   if (info?.note) lines.push(`_${info.note}_`);
   if (activity.content && CONTENT_TYPES.has(activity.type)) {
     const plain = htmlToPlain(activity.content);
@@ -281,7 +281,7 @@ export async function postActivityToThread(
       blocks: [
         { type: "section", text: { type: "mrkdwn", text: lines.join("\n") } },
       ],
-      text: `${prefix}${label} — ${dateStr}`,
+      text: `${prefix}${label} -- ${dateStr}`,
     });
   } catch (e) {
     console.error("[slack] postActivityToThread error:", e);

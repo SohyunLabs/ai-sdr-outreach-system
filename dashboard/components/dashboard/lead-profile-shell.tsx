@@ -100,13 +100,13 @@ function ActivityHistoryCard({
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-          활동 기록
+          Activity Log
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
         <div ref={scrollRef} className="max-h-[420px] overflow-y-auto flex flex-col gap-5 pr-1">
           {grouped.length === 0 ? (
-            <p className="text-center text-sm text-muted-foreground py-4">활동 기록 없음</p>
+            <p className="text-center text-sm text-muted-foreground py-4">No activity records</p>
           ) : (
             grouped.map(({ date, items }) => (
               <div key={date}>
@@ -131,13 +131,13 @@ function ActivityHistoryCard({
                       ? (activity.content ?? null)
                       : (sentLookup?.body ?? null);
                     const displaySubject = sentLookup?.subject ?? null;
-                    // linkedinInviteDone은 항상 status-only (내용 없이 표시)
+                    // linkedinInviteDone is always status-only (shown without content)
                     const isStatusOnly = (!isInbound && !isContentActivity) ||
                       activity.type === "linkedinInviteDone";
 
                     const senderName = isInbound
-                      ? (contactName ?? "상대방")
-                      : (assigneeName ?? "팀");
+                      ? (contactName ?? "Lead")
+                      : (assigneeName ?? "Team");
                     const isExpanded = expandedIds.has(activity.id);
                     const time = new Date(activity.occurredAt).toLocaleTimeString("ko-KR", {
                       hour: "2-digit",
@@ -199,7 +199,7 @@ function ActivityHistoryCard({
                         {/* Subject */}
                         {displaySubject && (
                           <p className="text-[11px] text-muted-foreground mb-1">
-                            제목: <span className="font-medium text-foreground/70">{displaySubject}</span>
+                            Subject: <span className="font-medium text-foreground/70">{displaySubject}</span>
                           </p>
                         )}
 
@@ -217,12 +217,12 @@ function ActivityHistoryCard({
                                 className="text-[11px] text-muted-foreground hover:text-foreground mt-1.5 underline-offset-2 hover:underline"
                                 onClick={() => toggleContent(activity.id)}
                               >
-                                {isExpanded ? "접기" : "더 보기"}
+                                {isExpanded ? "Collapse" : "Show more"}
                               </button>
                             )}
                           </>
                         ) : (
-                          <p className="text-xs text-muted-foreground/50 italic">내용 없음</p>
+                          <p className="text-xs text-muted-foreground/50 italic">No content</p>
                         )}
                       </div>
                     );
@@ -298,16 +298,16 @@ function LemlistInboxCard({
   }, []);
 
   const META: Record<InboxItem["type"], { label: string; icon: "email" | "linkedin" | "system" }> = {
-    "email-sent":       { label: "이메일 발송", icon: "email" },
-    "email-reply":      { label: "이메일 회신 수신", icon: "email" },
-    "email-bounced":    { label: "이메일 반송", icon: "email" },
-    "email-opened":     { label: "이메일 열람", icon: "email" },
-    "linkedin-connect": { label: "LinkedIn 일촌 신청", icon: "linkedin" },
-    "linkedin-message": { label: "LinkedIn 메시지 발송", icon: "linkedin" },
-    "linkedin-opened":  { label: "LinkedIn 메시지 열람", icon: "linkedin" },
-    "linkedin-reply":   { label: "LinkedIn 답장 수신", icon: "linkedin" },
-    "linkedin-accepted":{ label: "LinkedIn 일촌 수락", icon: "linkedin" },
-    "linkedin-visit":   { label: "LinkedIn 방문", icon: "linkedin" },
+    "email-sent":       { label: "Email Sent", icon: "email" },
+    "email-reply":      { label: "Email Reply Received", icon: "email" },
+    "email-bounced":    { label: "Email Bounced", icon: "email" },
+    "email-opened":     { label: "Email Opened", icon: "email" },
+    "linkedin-connect": { label: "LinkedIn Invite Sent", icon: "linkedin" },
+    "linkedin-message": { label: "LinkedIn Message Sent", icon: "linkedin" },
+    "linkedin-opened":  { label: "LinkedIn Message Opened", icon: "linkedin" },
+    "linkedin-reply":   { label: "LinkedIn Reply Received", icon: "linkedin" },
+    "linkedin-accepted":{ label: "LinkedIn Invite Accepted", icon: "linkedin" },
+    "linkedin-visit":   { label: "LinkedIn Visit", icon: "linkedin" },
   };
 
   const isStatusOnly = (item: InboxItem) => {
@@ -320,7 +320,7 @@ function LemlistInboxCard({
     <Card>
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-          발송 이력 (Inbox)
+          Send History (Inbox)
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-0">
@@ -332,7 +332,7 @@ function LemlistInboxCard({
               ))}
             </div>
           ) : items.length === 0 ? (
-            <p className="text-center text-sm text-muted-foreground py-4">발송 이력 없음</p>
+            <p className="text-center text-sm text-muted-foreground py-4">No send history</p>
           ) : (
             grouped.map(({ date, items: dayItems }) => (
               <div key={date}>
@@ -350,7 +350,7 @@ function LemlistInboxCard({
                     const bodyText = item.isHtml && item.body ? htmlToText(item.body) : (item.body ?? "");
                     const isExpanded = expandedIds.has(item.id);
                     const isInbound = item.isInbound;
-                    const senderName = isInbound ? (contactName ?? "상대방") : (assigneeName ?? "팀");
+                    const senderName = isInbound ? (contactName ?? "Lead") : (assigneeName ?? "Team");
 
                     // Status-only events
                     if (isStatusOnly(item)) {
@@ -403,7 +403,7 @@ function LemlistInboxCard({
                         {/* Subject */}
                         {item.subject && (
                           <p className="text-[11px] text-muted-foreground mb-1">
-                            제목: <span className="font-medium text-foreground/70">{item.subject}</span>
+                            Subject: <span className="font-medium text-foreground/70">{item.subject}</span>
                           </p>
                         )}
                         {/* Body */}
@@ -414,7 +414,7 @@ function LemlistInboxCard({
                             </p>
                           </>
                         ) : (
-                          <p className="text-xs text-muted-foreground/50 italic">내용 없음</p>
+                          <p className="text-xs text-muted-foreground/50 italic">No content</p>
                         )}
                       </div>
                     );
@@ -442,7 +442,7 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
-  // Lemlist 동기화
+  // Lemlist sync
   const [syncing, setSyncing] = useState(false);
   const [discarding, setDiscarding] = useState(false);
   const [launching, setLaunching] = useState(false);
@@ -459,16 +459,16 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
   const flowNodes = hasEmail ? buildEmailSequence(msg) : buildLinkedinSequence(msg);
   const completedSteps = deriveCompletedActivities(profile.activities, hasEmail);
   const inviteAccepted = profile.activities.some(a => a.type === "linkedinInviteAccepted");
-  const linkedinConnectDone = completedSteps.has("LinkedIn 일촌 신청");
+  const linkedinConnectDone = completedSteps.has("LinkedIn Invite");
   const isM5Skipped = linkedinConnectDone && !inviteAccepted && !completedSteps.has("M5");
   const sequenceDone = completedSteps.has("M6");
   const TOTAL_STEPS = 5;
-  const M_STEP_LABELS = new Set(["M1", "M2", "M3", "LinkedIn 일촌 신청", "M5", "M6"]);
+  const M_STEP_LABELS = new Set(["M1", "M2", "M3", "LinkedIn Invite", "M5", "M6"]);
   const effectiveDone = sequenceDone
     ? TOTAL_STEPS
     : [...completedSteps.keys()].filter(k => M_STEP_LABELS.has(k)).length + (isM5Skipped ? 1 : 0);
 
-  // 이메일 body: DB에 <br> 저장된 경우 textarea용 \n으로 변환
+  // Convert <br> in email body from DB to \n for textarea
   const toBr = (v: string | null | undefined) => (v ?? "").replace(/<br\s*\/?>/gi, "\n");
   const initDraft = () => ({
     m1Subject: msg?.m1Subject ?? "",
@@ -501,13 +501,13 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "저장 실패");
+        throw new Error(data.error ?? "Save failed");
       }
       setEditMode(false);
       setIsDirty(true);
       router.refresh();
     } catch (e) {
-      setSaveError(e instanceof Error ? e.message : "저장 중 오류 발생");
+      setSaveError(e instanceof Error ? e.message : "Error while saving");
     } finally {
       setSaving(false);
     }
@@ -523,16 +523,16 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
     setDiscarding(true);
     try {
       const res = await fetch(`/api/leads/${profile.id}/discard`, { method: "POST" });
-      if (!res.ok) throw new Error("되돌리기 실패");
-      toast.success("변경사항이 되돌려졌습니다", {
-        description: "Lemlist 데이터로 복원됐습니다.",
+      if (!res.ok) throw new Error("Discard failed");
+      toast.success("Changes reverted", {
+        description: "Restored from Lemlist data.",
         duration: 3000,
       });
       setIsDirty(false);
       router.refresh();
     } catch (e) {
-      toast.error("되돌리기 실패", {
-        description: e instanceof Error ? e.message : "알 수 없는 오류",
+      toast.error("Discard failed", {
+        description: e instanceof Error ? e.message : "Unknown error",
         duration: 3000,
       });
     } finally {
@@ -546,16 +546,16 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
       const res = await fetch(`/api/leads/${profile.id}/launch`, { method: "POST" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data.error ?? "런치 실패");
+        throw new Error(data.error ?? "Launch failed");
       }
       if (data.errors?.length) {
-        toast.warning("일부 항목 실패", {
+        toast.warning("Some items failed", {
           description: (data.errors as string[]).join("\n"),
           duration: 3000,
         });
       } else {
-        toast.success("Lemlist Launch 완료", {
-          description: "메시지 시퀀스가 동기화되고 발송이 시작됐습니다.",
+        toast.success("Lemlist Launch complete", {
+          description: "Message sequence synced and sending started.",
           duration: 3000,
         });
         setIsDirty(false);
@@ -563,8 +563,8 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
         router.refresh();
       }
     } catch (e) {
-      toast.error("런치 실패", {
-        description: e instanceof Error ? e.message : "알 수 없는 오류",
+      toast.error("Launch failed", {
+        description: e instanceof Error ? e.message : "Unknown error",
         duration: 3000,
       });
     } finally {
@@ -579,24 +579,24 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
     try {
       const launchRes = await fetch(`/api/campaigns/${pendingCampaignId}/launch/${airtableId}`, { method: "POST" });
       const launchData = await launchRes.json().catch(() => ({}));
-      if (!launchRes.ok) throw new Error(launchData.error ?? "런치 실패");
+      if (!launchRes.ok) throw new Error(launchData.error ?? "Launch failed");
 
-      toast.loading("Lemlist Launch 실행 중...", { id: "pending-sync" });
+      toast.loading("Running Lemlist Launch...", { id: "pending-sync" });
       await fetch("/api/sync", { method: "POST" });
       toast.dismiss("pending-sync");
 
       const lookupRes = await fetch(`/api/campaigns/${pendingCampaignId}/contacts/${airtableId}/lead`);
       if (lookupRes.ok) {
         const { id } = await lookupRes.json();
-        toast.success("Lemlist Launch 완료", { duration: 3000 });
+        toast.success("Lemlist Launch complete", { duration: 3000 });
         router.push(`/leads/${id}?from=campaign-analysis`);
       } else {
-        toast.success("Launch 완료 — Campaign Analysis에서 확인하세요", { duration: 3000 });
+        toast.success("Launch complete -- check Campaign Analysis", { duration: 3000 });
         router.push("/?tab=campaign-analysis");
       }
     } catch (e) {
-      toast.error("런치 실패", {
-        description: e instanceof Error ? e.message : "알 수 없는 오류",
+      toast.error("Launch failed", {
+        description: e instanceof Error ? e.message : "Unknown error",
         duration: 3000,
       });
     } finally {
@@ -610,20 +610,20 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
       const res = await fetch(`/api/leads/${profile.id}/sync-contact`, { method: "POST" });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        throw new Error(data.error ?? "동기화 실패");
+        throw new Error(data.error ?? "Sync failed");
       }
       if (data.errors?.length) {
-        toast.warning("일부 항목 동기화 실패", {
+        toast.warning("Some items failed to sync", {
           description: (data.errors as string[]).join("\n"),
           duration: 3000,
         });
       } else {
-        toast.success("변경사항이 Lemlist에 반영됐습니다.", { duration: 3000 });
+        toast.success("Changes applied to Lemlist.", { duration: 3000 });
         setIsDirty(false);
       }
     } catch (e) {
-      toast.error("반영 실패", {
-        description: e instanceof Error ? e.message : "알 수 없는 오류",
+      toast.error("Apply failed", {
+        description: e instanceof Error ? e.message : "Unknown error",
         duration: 3000,
       });
     } finally {
@@ -663,7 +663,7 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
           </div>
           {data.subjectKey && (
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground">제목</span>
+              <span className="text-[11px] text-muted-foreground">Subject</span>
               <input
                 className="w-full text-sm border rounded-md px-2 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-primary"
                 value={draft[data.subjectKey] ?? ""}
@@ -673,7 +673,7 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
           )}
           {data.bodyKey && (
             <div className="flex flex-col gap-1">
-              <span className="text-[11px] text-muted-foreground">본문</span>
+              <span className="text-[11px] text-muted-foreground">Body</span>
               <textarea
                 className="w-full text-sm border rounded-md px-2 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-primary min-h-[80px] resize-y"
                 value={draft[data.bodyKey] ?? ""}
@@ -699,10 +699,10 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
           <span className="text-sm font-medium flex-1">{data.subject ?? "—"}</span>
           {isSent && (
             <span className="text-xs text-muted-foreground shrink-0">
-              {sentDate ? sentDate.toLocaleDateString("ko-KR", { month: "short", day: "numeric" }) : "전송됨"}
+              {sentDate ? sentDate.toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "Sent"}
             </span>
           )}
-          {data.label === "M5" && isM5Skipped && <span className="text-xs text-muted-foreground/60 shrink-0">건너뜀</span>}
+          {data.label === "M5" && isM5Skipped && <span className="text-xs text-muted-foreground/60 shrink-0">Skipped</span>}
           {data.body && (
             <Button variant="ghost" size="sm" className="h-5 w-5 p-0 shrink-0" onClick={() => toggleStep(key)}>
               {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -758,7 +758,7 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
           (b.deciderLabels ?? []).some(label => completedSteps.has(label))
         );
         if (idx >= 0) return idx;
-        // "미수락 시" fallback: LinkedIn 일촌 신청은 됐지만 수락 없음
+        // "Not accepted" fallback: LinkedIn Invite sent but not accepted
         if (isM5Skipped) {
           const skippedIdx = branches.findIndex(b => (b.deciderLabels ?? []).length === 0);
           if (skippedIdx >= 0) return skippedIdx;
@@ -770,7 +770,7 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
         <div className="flex-1 mb-2">
           <p className="text-xs font-medium text-muted-foreground mb-2">
             {day !== undefined && <span className="text-muted-foreground/60 mr-1">Day {day} ·</span>}
-            {conditionLabel}에 따라 분기
+            Branch on {conditionLabel}
           </p>
           <div className="grid grid-cols-2 gap-2">
             {branches.map((branch, bi) => {
@@ -790,12 +790,12 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
                     <p className="text-xs font-semibold">{branch.label}</p>
                     {isActive && (
                       <Badge variant="outline" className="px-1.5 py-0 text-[10px] h-4 border-primary text-primary">
-                        이 경로
+                        This path
                       </Badge>
                     )}
                   </div>
                   {branch.steps.length === 0 ? (
-                    <p className="text-xs text-muted-foreground italic">건너뜀</p>
+                    <p className="text-xs text-muted-foreground italic">Skipped</p>
                   ) : (
                     <div className="flex flex-col">{renderNodes(branch.steps, `${key}-b${bi}`, true)}</div>
                   )}
@@ -830,7 +830,7 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
 
       <div className="flex flex-1 flex-col overflow-hidden">
         <Header
-          title={contact?.name ?? "프로필 상세"}
+          title={contact?.name ?? "Profile Detail"}
           back={
             <Button
               variant="ghost"
@@ -852,7 +852,7 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
           <div className="flex items-center justify-between gap-4 border-b border-amber-200 bg-amber-50 px-8 py-2.5 dark:border-amber-800 dark:bg-amber-950/40">
             <div className="flex items-center gap-2 text-amber-800 dark:text-amber-300">
               <AlertTriangle className="h-4 w-4 shrink-0" />
-              <p className="text-sm">변경된 내용이 Lemlist에 아직 반영되지 않았습니다. 변경사항을 반영하거나 수정 내용을 되돌릴 수 있습니다.</p>
+              <p className="text-sm">Changes have not been applied to Lemlist yet. You can apply changes or discard edits.</p>
             </div>
             <div className="flex items-center gap-2 shrink-0">
               <Button
@@ -862,7 +862,7 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
                 onClick={handleDiscard}
                 disabled={discarding || syncing}
               >
-                {discarding ? "되돌리는 중..." : "Discard Changes"}
+                {discarding ? "Discarding..." : "Discard Changes"}
               </Button>
               <Button
                 size="sm"
@@ -871,7 +871,7 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
                 disabled={syncing || discarding}
               >
                 <RefreshCw className={cn("h-3 w-3 mr-1", syncing && "animate-spin")} />
-                {syncing ? "반영 중..." : "Apply Changes"}
+                {syncing ? "Applying..." : "Apply Changes"}
               </Button>
             </div>
           </div>
@@ -887,18 +887,18 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                      배경 정보
+                      Background Info
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0">
                     {!contact ? (
-                      <p className="text-sm text-muted-foreground">연락처 정보 없음</p>
+                      <p className="text-sm text-muted-foreground">No contact info</p>
                     ) : (
                       <div className="grid grid-cols-2 gap-x-6">
                         {/* Left: basic info */}
                         <div className="flex flex-col divide-y divide-border">
                           <div className="flex flex-col gap-0.5 py-2.5 first:pt-0">
-                            <span className="text-[11px] text-muted-foreground">이름</span>
+                            <span className="text-[11px] text-muted-foreground">Name</span>
                             <span className="text-sm font-medium">
                               {contact.name ?? "—"}
                               {contact.country && (
@@ -907,15 +907,15 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
                             </span>
                           </div>
                           <div className="flex flex-col gap-0.5 py-2.5">
-                            <span className="text-[11px] text-muted-foreground">회사</span>
+                            <span className="text-[11px] text-muted-foreground">Company</span>
                             <span className="text-sm">{contact.company ?? "—"}</span>
                           </div>
                           <div className="flex flex-col gap-0.5 py-2.5">
-                            <span className="text-[11px] text-muted-foreground">직책</span>
+                            <span className="text-[11px] text-muted-foreground">Title</span>
                             <span className="text-sm">{contact.role ?? "—"}</span>
                           </div>
                           <div className="flex flex-col gap-0.5 py-2.5">
-                            <span className="text-[11px] text-muted-foreground">이메일</span>
+                            <span className="text-[11px] text-muted-foreground">Email</span>
                             <span className="text-sm">{contact.email ?? "—"}</span>
                           </div>
                           <div className="py-2.5">
@@ -933,7 +933,7 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
                           </div>
                           {contact.experiences && (
                             <div className="flex flex-col gap-1 py-2.5">
-                              <span className="text-[11px] text-muted-foreground">경력</span>
+                              <span className="text-[11px] text-muted-foreground">Experience</span>
                               {(() => {
                                 try {
                                   const exps = JSON.parse(contact.experiences);
@@ -966,7 +966,7 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
                         <div className="flex flex-col gap-4">
                           {contact.about && (
                             <div className="flex flex-col gap-1">
-                              <span className="text-[11px] text-muted-foreground">소개</span>
+                              <span className="text-[11px] text-muted-foreground">About</span>
                               <p className="text-sm leading-relaxed whitespace-pre-wrap">{contact.about}</p>
                             </div>
                           )}
@@ -983,14 +983,14 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
                 <Card>
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                      AI 분석
+                      AI Analysis
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="pt-0 flex flex-col gap-4">
                     {contact?.aiScore !== null && contact?.aiScore !== undefined && (
                       <div className="flex flex-col gap-2">
                         <div className="flex items-center justify-between">
-                          <span className="text-[11px] text-muted-foreground">AI 점수</span>
+                          <span className="text-[11px] text-muted-foreground">AI Score</span>
                           <span className="text-sm font-semibold">{contact.aiScore}/10</span>
                         </div>
                         <div className="h-1.5 rounded-full bg-muted overflow-hidden">
@@ -1003,18 +1003,18 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
                     )}
                     {contact?.aiScoringReason && (
                       <div className="flex flex-col gap-1">
-                        <span className="text-[11px] text-muted-foreground">점수 산정 이유</span>
+                        <span className="text-[11px] text-muted-foreground">Scoring Reason</span>
                         <p className="text-sm leading-relaxed">{contact.aiScoringReason}</p>
                       </div>
                     )}
                     {contact?.aiRecentInteractionsSummary && (
                       <div className="flex flex-col gap-1">
-                        <span className="text-[11px] text-muted-foreground">최근 관심사 / 인터랙션 요약</span>
+                        <span className="text-[11px] text-muted-foreground">Recent Interests / Interactions Summary</span>
                         <p className="text-sm leading-relaxed">{contact.aiRecentInteractionsSummary}</p>
                       </div>
                     )}
                     {!contact?.aiScoringReason && !contact?.aiRecentInteractionsSummary && (
-                      <p className="text-sm text-muted-foreground">AI 분석 데이터 없음</p>
+                      <p className="text-sm text-muted-foreground">No AI analysis data</p>
                     )}
                   </CardContent>
                 </Card>
@@ -1044,7 +1044,7 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                        캠페인 상태
+                        Campaign Status
                       </CardTitle>
                       {isPending && (
                         <Button
@@ -1062,17 +1062,17 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
                   <CardContent className="pt-0">
                     <div className="flex flex-col divide-y divide-border">
                       <div className="flex flex-col gap-0.5 py-2.5 first:pt-0">
-                        <span className="text-[11px] text-muted-foreground">캠페인</span>
+                        <span className="text-[11px] text-muted-foreground">Campaign</span>
                         <span className="text-sm font-medium">{profile.campaign.name}</span>
                       </div>
                       {profile.campaign.status && (
                         <div className="flex flex-col gap-0.5 py-2.5">
-                          <span className="text-[11px] text-muted-foreground">캠페인 상태</span>
+                          <span className="text-[11px] text-muted-foreground">Campaign Status</span>
                           <span className="text-sm">{profile.campaign.status}</span>
                         </div>
                       )}
                       <div className="flex flex-col gap-0.5 py-2.5">
-                        <span className="text-[11px] text-muted-foreground">리드 상태</span>
+                        <span className="text-[11px] text-muted-foreground">Lead Status</span>
                         <div className="mt-0.5">
                           {isQueuedForLaunch ? (
                             <Badge className="border-transparent bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
@@ -1098,9 +1098,9 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
                       </div>
                       {profile.assignedAt && (
                         <div className="flex flex-col gap-0.5 py-2.5">
-                          <span className="text-[11px] text-muted-foreground">배정일</span>
+                          <span className="text-[11px] text-muted-foreground">Assigned Date</span>
                           <span className="text-sm">
-                            {new Date(profile.assignedAt).toLocaleDateString("ko-KR", {
+                            {new Date(profile.assignedAt).toLocaleDateString("en-US", {
                               year: "numeric",
                               month: "long",
                               day: "numeric",
@@ -1117,27 +1117,27 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">
-                        메시지 시퀀스
+                        Message Sequence
                       </CardTitle>
                       <div className="flex items-center gap-2">
                         <Badge variant="outline" className="flex items-center gap-1 px-2 py-0.5 text-xs">
                           {hasEmail ? (
-                            <><Mail className="h-3 w-3" />이메일 시퀀스</>
+                            <><Mail className="h-3 w-3" />Email Sequence</>
                           ) : (
-                            <><svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>링크드인 시퀀스</>
+                            <><svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>LinkedIn Sequence</>
                           )}
                         </Badge>
                         {!editMode ? (
                           <Button variant="outline" size="sm" className="h-6 text-xs px-2" onClick={() => setEditMode(true)}>
-                            편집
+                            Edit
                           </Button>
                         ) : (
                           <>
                             <Button variant="ghost" size="sm" className="h-6 text-xs px-2" onClick={handleCancel} disabled={saving}>
-                              취소
+                              Cancel
                             </Button>
                             <Button size="sm" className="h-6 text-xs px-2" onClick={handleSave} disabled={saving}>
-                              {saving ? "저장 중..." : "저장"}
+                              {saving ? "Saving..." : "Save"}
                             </Button>
                           </>
                         )}
@@ -1149,7 +1149,7 @@ export function LeadProfileShell({ profile, lastSyncAt, mode, pendingCampaignId,
                   </CardHeader>
                   <CardContent className="pt-0 max-h-[600px] overflow-y-auto">
                     {!msg && (
-                      <p className="text-xs text-muted-foreground italic mb-3">메시지 데이터 없음 — 시퀀스 구조만 표시</p>
+                      <p className="text-xs text-muted-foreground italic mb-3">No message data -- showing sequence structure only</p>
                     )}
                     <div className="relative flex flex-col gap-0">
                       {renderNodes(flowNodes, "")}

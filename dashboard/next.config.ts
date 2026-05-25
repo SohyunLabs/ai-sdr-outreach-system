@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-// 배포 트리거
+// deployment trigger
 const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,

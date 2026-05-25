@@ -8,7 +8,7 @@ export async function PATCH(
   const { airtableId } = await params;
   const body = await req.json();
 
-  // DB 업데이트
+  // DB update
   await prisma.message.updateMany({
     where: { contactId: airtableId },
     data: {
@@ -29,7 +29,7 @@ export async function PATCH(
     },
   });
 
-  // 메시지 편집 시 연관 리드 dirty 표시
+  // Mark related leads as dirty on message edit
   await prisma.campaignLead.updateMany({
     where: { airtableContactId: airtableId },
     data: { isLemlistDirty: true },

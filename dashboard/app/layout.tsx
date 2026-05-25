@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "AI SDR Dashboard",
-  description: "Fitogether AI SDR Pipeline Monitor & Dashboard",
+  description: "AI SDR Pipeline Monitor & Dashboard (Portfolio Version)",
   icons: { icon: "/favicon.svg" },
 };
 
@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <Providers>{children}</Providers>

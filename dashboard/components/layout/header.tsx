@@ -39,7 +39,7 @@ export function Header({ title, subtitle, back, actions }: HeaderProps) {
         <DropdownMenu>
           <DropdownMenuTrigger className="outline-none">
             <Avatar className="h-8 w-8 cursor-pointer">
-              <AvatarImage src={session?.user?.image ?? ""} alt={session?.user?.name ?? "사용자"} />
+              <AvatarImage src={session?.user?.image ?? ""} alt={session?.user?.name ?? "User"} />
               <AvatarFallback>{session?.user?.name?.charAt(0).toUpperCase() ?? "U"}</AvatarFallback>
             </Avatar>
           </DropdownMenuTrigger>
@@ -54,7 +54,7 @@ export function Header({ title, subtitle, back, actions }: HeaderProps) {
               className="cursor-pointer"
             >
               <LogOut className="mr-2 h-4 w-4" />
-              로그아웃
+              Sign out
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

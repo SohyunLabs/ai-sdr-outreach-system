@@ -108,12 +108,12 @@ export function computeSummary(leads: CampaignLeadWithContact[]): CampaignSummar
 }
 
 export function formatSyncTimestamp(date: Date | null): string {
-  if (!date) return "동기화 기록 없음";
+  if (!date) return "No sync records";
   const mo = (date.getMonth() + 1).toString().padStart(2, "0");
   const d = date.getDate().toString().padStart(2, "0");
   const h = date.getHours().toString().padStart(2, "0");
   const m = date.getMinutes().toString().padStart(2, "0");
-  return `마지막 동기화: ${mo}/${d} ${h}:${m}`;
+  return `Last sync: ${mo}/${d} ${h}:${m}`;
 }
 
 // --- Unmatched leads ---
@@ -144,13 +144,12 @@ export interface ContactWithLeads {
   role: string | null;
   aiScore: number | null;
   email: string | null;
-  leads: ContactLeadSummary[]; // 빈 배열 = 미배정
+  leads: ContactLeadSummary[]; // empty array = unassigned
 }
 
 /**
- * active/inProgress 상태(BLUE_STATES) 최우선 반환.
- * 없으면 leads[0] 반환. 빈 배열이면 null.
- * CAMP-01, CAMP-02 요건 구현.
+ * Prioritizes active/inProgress states (BLUE_STATES).
+ * Falls back to leads[0]. Returns null for empty array.
  */
 export function selectPrimaryLead(
   leads: ContactLeadSummary[]

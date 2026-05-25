@@ -92,7 +92,7 @@ describe("buildSteps", () => {
     expect(steps[0].body).toBe("Body 1");
   });
 
-  it("M4 uses fixed subject 'LinkedIn 연결 요청' and m4LiConnReq as body", () => {
+  it("M4 uses fixed subject 'LinkedIn Connection Request' and m4LiConnReq as body", () => {
     const msg = {
       m1Subject: null, m1BodyEmail: null,
       m2Subject: null, m2BodyEmail: null,
@@ -102,11 +102,11 @@ describe("buildSteps", () => {
       m6Subject: null, m6BodyEmail: null,
     };
     const steps = buildSteps(msg);
-    expect(steps[3].subject).toBe("LinkedIn 연결 요청");
+    expect(steps[3].subject).toBe("LinkedIn Connection Request");
     expect(steps[3].body).toBe("Connect with me");
   });
 
-  it("M5 uses fixed subject 'LinkedIn 채팅' and m5LiChat as body", () => {
+  it("M5 uses fixed subject 'LinkedIn Chat' and m5LiChat as body", () => {
     const msg = {
       m1Subject: null, m1BodyEmail: null,
       m2Subject: null, m2BodyEmail: null,
@@ -116,7 +116,7 @@ describe("buildSteps", () => {
       m6Subject: null, m6BodyEmail: null,
     };
     const steps = buildSteps(msg);
-    expect(steps[4].subject).toBe("LinkedIn 채팅");
+    expect(steps[4].subject).toBe("LinkedIn Chat");
     expect(steps[4].body).toBe("Hi there");
   });
 

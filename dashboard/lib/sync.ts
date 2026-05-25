@@ -96,13 +96,13 @@ async function syncLemlistCampaignsAndLeads(): Promise<{
         where: { lemlistLeadId: leadData.lemlistLeadId },
         update: {
           campaignId: leadData.campaignId,
-          // airtableContactId는 non-null 값이 있을 때만 업데이트 (기존 연결을 null로 덮어쓰지 않음)
+          // Only update airtableContactId when non-null (preserve existing link)
           ...(leadData.airtableContactId !== null && { airtableContactId: leadData.airtableContactId }),
           state: leadData.state,
           lemlistStatus: leadData.lemlistStatus,
           sequenceStep: leadData.sequenceStep,
           totalSequenceSteps: leadData.totalSequenceSteps,
-          // assignedAt은 런치 시점에 기록된 값을 보존 (null로 덮어쓰지 않음)
+          // Preserve assignedAt recorded at launch time (don't overwrite with null)
           ...(leadData.assignedAt !== null && { assignedAt: leadData.assignedAt }),
           syncedAt: new Date(),
         },
@@ -121,7 +121,7 @@ async function syncLemlistCampaignsAndLeads(): Promise<{
     }
   }
 
-  // 삭제된 캠페인의 리드 정리 (캠페인 자체가 Lemlist에서 사라진 경우)
+  // Clean up leads from deleted campaigns (campaign removed from Lemlist)
   if (syncedCampaignIds.length > 0) {
     const deletedCampaignLeads = await prisma.campaignLead.findMany({
       where: { campaignId: { notIn: syncedCampaignIds } },
@@ -134,8 +134,8 @@ async function syncLemlistCampaignsAndLeads(): Promise<{
     }
   }
 
-  // 처리된 캠페인 내에서 Lemlist export에서 제외된 리드만 삭제 (안전 범위 한정)
-  // syncedCampaignIds 범위 내에서만 삭제하여 export 실패 시 과잉 삭제 방지
+  // Only delete leads excluded from Lemlist export within synced campaigns
+  // Scoped to syncedCampaignIds to prevent over-deletion on export failure
   const staleLeads = await prisma.campaignLead.findMany({
     where: {
       campaignId: { in: syncedCampaignIds },
@@ -149,7 +149,7 @@ async function syncLemlistCampaignsAndLeads(): Promise<{
     await prisma.campaignLead.deleteMany({ where: { id: { in: staleLeadIds } } });
   }
 
-  // Lemlist에서 삭제된 캠페인 정리 (위에서 리드를 먼저 삭제했으므로 FK 제약 없음)
+  // Clean up campaigns deleted from Lemlist (leads already removed above, no FK constraint)
   if (syncedCampaignIds.length > 0) {
     await prisma.campaign.deleteMany({ where: { id: { notIn: syncedCampaignIds } } });
   }
@@ -160,7 +160,7 @@ async function syncLemlistCampaignsAndLeads(): Promise<{
 async function syncLemlistActivities(): Promise<{ count: number; errors: string[] }> {
   const campaigns = await prisma.campaign.findMany({ select: { id: true } });
 
-  // 모든 캠페인의 리드를 한 번에 수집
+  // Collect leads from all campaigns at once
   const allLeads: { campaignId: string; dbId: string; lemlistLeadId: string }[] = [];
   for (const campaign of campaigns) {
     const leads = await prisma.campaignLead.findMany({
@@ -174,7 +174,7 @@ async function syncLemlistActivities(): Promise<{ count: number; errors: string[
 
   console.log(`[syncActivities] total leads to sync: ${allLeads.length}`);
 
-  // 5개씩 병렬 처리
+  // Process 5 at a time in parallel
   const CONCURRENCY = 5;
   let totalActivityCount = 0;
   const errors: string[] = [];
@@ -183,7 +183,7 @@ async function syncLemlistActivities(): Promise<{ count: number; errors: string[
     const batch = allLeads.slice(i, i + CONCURRENCY);
     const results = await Promise.allSettled(
       batch.map(async ({ campaignId, dbId, lemlistLeadId }) => {
-        // 리드별 개별 fetch — campaign 단위 일괄 fetch는 leadId 누락 버그 있음
+        // Fetch per lead — bulk fetch by campaign has leadId omission bug
         const leadActivities = await fetchLeadActivities(campaignId, lemlistLeadId);
         if (!leadActivities || leadActivities.length === 0) return 0;
 
@@ -225,12 +225,12 @@ async function syncLemlistActivities(): Promise<{ count: number; errors: string[
 async function syncSlack(): Promise<void> {
   console.log("[syncSlack] starting");
 
-  // 이전 sync 시점을 기준으로 "새 activity" 판단
+  // Determine "new activity" based on previous sync time
   const prevSync = await prisma.syncLog.findFirst({ orderBy: { syncedAt: "desc" }, skip: 1 });
   const newCutoff = prevSync?.syncedAt ?? new Date(Date.now() - 24 * 60 * 60 * 1000);
   console.log(`[syncSlack] newCutoff=${newCutoff.toISOString()}`);
 
-  // 이전 sync 이후 새 activity가 있는 리드만 대상
+  // Only target leads with new activities since last sync
   const leads = await prisma.campaignLead.findMany({
     where: {
       activities: { some: { occurredAt: { gt: newCutoff } } },
@@ -258,7 +258,7 @@ async function syncSlack(): Promise<void> {
       const newActivities = lead.activities.filter((a) => a.occurredAt > newCutoff);
 
       if (!lead.slackThreadTs) {
-        // 스레드 없음 → parent 생성 + 과거 히스토리 묶음 + 새 activity 개별 포스팅
+        // No thread — create parent + batch historical activities + post new activities individually
         const channelId = resolveChannel(country);
         const ts = await postLeadLaunch({
           channelId,
@@ -280,13 +280,13 @@ async function syncSlack(): Promise<void> {
           data: { slackThreadTs: ts, slackChannelId: channelId },
         });
 
-        // 과거 히스토리 → 하나의 묶음 메시지
+        // Historical activities — batch into one message
         const historical = lead.activities.filter((a) => a.occurredAt <= newCutoff);
         if (historical.length > 0) {
           await postActivitiesBatch(ts, channelId, historical);
         }
 
-        // 새 activity → 개별 포스팅
+        // New activities — post individually
         for (const a of newActivities) {
           await postActivityToThread(ts, channelId, a);
         }
@@ -297,7 +297,7 @@ async function syncSlack(): Promise<void> {
         });
         console.log(`[syncSlack] new thread lead=${lead.id} history=${historical.length} new=${newActivities.length}`);
       } else {
-        // 스레드 있음 → 새 activity만 개별 포스팅
+        // Thread exists — post only new activities individually
         const channelId = lead.slackChannelId ?? resolveChannel(country);
         const cutoff = lead.slackLastPostedAt ?? newCutoff;
         const toPost = lead.activities.filter((a) => a.occurredAt > cutoff);
